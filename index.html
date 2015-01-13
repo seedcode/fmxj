@@ -1,0 +1,729 @@
+<!doctype html>
+
+<html>
+	
+<head>
+	
+<script src="fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="css/fmxj.css">
+
+</head>
+
+<body>
+	
+	<br/>
+	<div style="height:112px">
+		<a href="http://SeedCode.com" style="cursor:pointer">
+		<img src="logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;float:right">
+		</a>
+	</div>
+	
+	<div class="title text-shadow">
+		<span>fmxj.js</span>
+		<span>
+			<button id="ghub" class="shadow gh">
+				 download fmxj.js from github
+			 </button>
+		</span>
+	</div>
+	<div class="chapter">A JavaScript approach to FileMaker Custom Web Publishing.</div>
+	<div class="subchapter bottomMargin">With fmxj.js and simple JavaScript Objects/JSON, you can...
+		<ul>
+			<li>Build complex queries and POST them to FileMaker Server.</li>
+			<li>Return FileMaker parent and child records as JSON.</li>
+			<li>Create, edit and delete FileMaker records.</li>
+			<li>Filter and sort arrays of JavaScript objects locally with complex criteria.</li>
+		</ul>
+
+	</div>
+	
+	<div class="separator"></div>
+	<div class="function">findRecordsURL (fileName, layoutName, requests[, sort, max, skip])</div>
+	<div class="small">Create a complex xml -findquery from an array of javascript objects. These queries are then passed to the postQueryFMS function which returns the results as an array of JavaScript Objects (JSON).</div>
+	<div class="pad shadow">
+		<div class="line">
+			<span class="label">fileName:</span>
+			<span class="desc">String: Name of the hosted FileMaker file.</span>
+		</div>
+		<div class="line">
+			<span class="label">layoutName:</span>
+			<span class="desc">String: Name of the target layout on the specified hosted FileMaker file.</span>
+		</div>
+		<div class="line">
+			<span class="label">requests:</span>
+			<span class="desc">Array of Objects: Each object represents a FileMaker find request.</span>
+		</div>
+		<div class="line">
+			<span class="label">sort:</span>
+			<span class="desc">(Optional) Object: Specifying sort fields and order.</span>
+		</div>
+		<div class="line">
+			<span class="label">max:</span>
+			<span class="desc">(Optional) Number: Maximum number of records to return.</span>
+		</div>
+		<div class="line">
+			<span class="label">skip:</span>
+			<span class="desc">(Optional) Number: Number of records to skip before returning results.</span>
+		</div>
+	
+	</div>
+	<div class="small">example 1.1: Two request find.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="requests" class="code small indent"></pre>
+		</div>
+		<div class="line">
+			<pre class="code small">2. fmxj.findRecordsURL ( "Events" , "Events" , requests );</pre>
+		</div>
+	</div>
+	<div>
+		<button id="getfindxml" class="shadow">try</button>
+	</div>
+	<div class="pad shadow">
+		<div id="xmlfind" class="result"></div>
+	</div>
+	<div class="small">example 1.2: Add additional criteria to requests object, so both requests have the Resource field equal to "Example C".</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="requests" class="code small">3. requests[0]["Resource"] = "Example C";</pre>
+			<pre id="requests" class="code small">4. requests[1]["Resource"] = "Example C";</pre>
+		</div>
+	</div>
+	<div>
+		<button id="addfindxml" class="shadow">try</button>
+	</div>
+	<div class="pad shadow">
+		<div id="xmladdfind" class="result"></div>
+	</div>
+	<div class="small">example 1.3: Specify a sort order for the request by passing an object to the optional sort argument.  Supprted order values are: ascend, descend and valuelist.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="sort" class="code small indent"></pre>
+		</div>
+		<div class="line">
+			<pre class="code small">2. fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );</pre>
+		</div>
+	</div>
+	<div>
+		<button id="sortbtn" class="shadow">try</button>
+	</div>
+	<div class="pad shadow">
+		<div id="xmlsort" class="result"></div>
+	</div>
+	
+	<div class="small">example 1.4: Specify an Omit Request by setting the -omit property to 1.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="requestsOmit" class="code small indent"></pre>
+		</div>
+		<div class="line">
+			<pre class="code small">2. fmxj.findRecordsURL ( "Events" , "Events" , requests );</pre>
+		</div>
+	</div>
+	<div>
+		<button id="omitfindxml" class="shadow">try</button>
+	</div>
+	<div class="pad shadow">
+		<div id="xmlomitfind" class="result"></div>
+	</div>
+	
+	<div class="separator"></div>
+	<div class="function">postQueryFMS (query, callBackOnReady[, callBackOnDownload, phpRelay])</div>
+	<div class="small">POSTS a query to FileMaker Server and returns the results as JavaScript Objects (JSON) for Callback.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<span class="label">query:</span>
+			<span class="desc">String: The query built by one of the URL functions.</span>
+		</div>
+		<div class="line">
+			<span class="label">callBackOnReady:</span>
+			<span class="desc">Function: Handler for the returned array of objects.</span>
+		</div>
+		<div class="line">
+			<span class="label">callBackOnDownload:</span>
+			<span class="desc">(Optional) Function: Handler for progress reports for the http request download.</span>
+		</div>
+		<div class="line">
+			<span class="label">phpRelay:</span>
+			<span class="desc">(Optional) Object: Specifies the php relay file (fmxjRelay.php) and location.</span>
+		</div>
+	</div>
+	
+	<div class="small">example 2.1: Create query and POST to FileMaker server, then return results as JavaScript objects.  Stringified results are written to the div via call back function.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre class="code small">1. var url = fmxj.findRecordsURL ( "Events" , "Events" , requests );</pre>
+			<pre class="code small">2. fmxj.postQueryFMS ( url , onReadyFunction , onProgressFunction  );</pre>
+		</div>
+	</div>
+	<div>
+		<button id="btnjson" class="shadow">try</button>
+		<span>&nbsp</span>
+		<span id="count">Uses the currently selected xml query from above so you can try them all. </span>
+	</div>
+	<div class="pad shadow">
+		<pre id="findResult" class="result tall"></pre>
+	</div>
+	
+	<div class="small">example 2.2: Errors returned as a simple one object array with the Filemaker error code:</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre class="code small">1. var url = fmxj.findRecordsURL ( "Events" , "ShmEvents" , requests );</pre>
+			<pre class="code small">2. fmxj.postQueryFMS ( url , callBackFunction );</pre>
+		</div>
+	</div>
+	<div>
+		<button id="errorbtn" class="shadow">try</button>
+	</div>
+	<div class="pad shadow">
+		<div id="error" class="result"></div>
+	</div>
+	
+	<div class="small">example 2.3: Portals on the target layout will be returned as nested arrays.  Properties that represent related records will have the Table Occurerence name followed by "::".</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre class="code small">1. var requests = [{"Status":"Customer"}];</pre>
+			<pre class="code small">2. var url = fmxj.findRecordsURL ( "Contacts" , "Contacts" , requests );</pre>
+			<pre class="code small">3. fmxj.postQueryFMS ( url , onReadyFunction , onProgressFunction  );</pre>
+		</div>
+	</div>
+	<div>
+		<button id="btncontact" class="shadow">try</button>
+		<span>&nbsp</span>
+		<span id="contactcount"></span>
+	</div>
+	<div class="pad shadow">
+		<pre id="contactresult" class="result tall"></pre>
+	</div>
+	
+	<div class="small">example 2.4: Use a PHP relay if your FileMaker Server is hosted remotely from your Web Server by adding the fmxjRelay.php file to your WPE root directory. Then create an object in your JavaScript that defines the server location and pass it to the function. Supported properties for the object: { "php" : the php file , "server" : server location , "protocol" : [optional: default http] , "port" : [optional: default 80] ,"user" : [optional: FM Account] , "pass" : [optional: FM Account Password] } </div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre class="code small">1. var relay = {"php":"fmxjRelay.php","server":"71.229.202.172"};</pre>
+			<pre class="code small">2. fmxj.postQueryFMS ( url , callBackFunction , null , relay );</pre>
+		</div>
+	</div>
+	
+	<div class="separator"></div>
+	<div class="function">editRecordURL ( fileName , layoutName , editObj )</div>
+	<div class="small">Create a FileMaker -edit or -new query url from a javascript object.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<span class="label">fileName:</span>
+			<span class="desc">String: Name of the hosted FileMaker file.</span>
+		</div>
+		<div class="line">
+			<span class="label">layoutName:</span>
+			<span class="desc">String: Name of the target layout on the specified hosted FileMaker file.</span>
+		</div>
+		<div class="line">
+			<span class="label">editObj:</span>
+			<span class="desc">Object: Specifies changes to be made to the specified FileMaker record.  Specify -recid property to edit specified record.  Do not include -recid property to create a new record.</span>
+		</div>
+	</div>
+	
+	
+	<div class="small">example 3.1: Read the first object in the array and update the corresponding FileMaker record.  If the Status is Open, set it to Closed, and vice-versa.  If server edit is succesful, then the full object/record will be returned and the array displayed above in example 2.1 will be updated. </div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre class="code small">1. firstRecord = source[0];</pre>
+			<pre class="code small">2. var recid = firstRecord["-recid"];</pre>
+			<pre class="code small">3. var recordStatus = firstRecord["Status"];</pre>
+			<pre class="code small">4. var recordModId = firstRecord["-modid"] ;</pre>
+			<pre class="code small">5. //create an edit object and array for this record with the new status</pre>
+			<pre class="code small">6. var edit = {"-recid";recid};</pre>
+			<pre class="code small">7. var requests = [edit];</pre>
+			<pre class="code small">8. if ( recordStatus == "Open" ) {var newStatus = "Closed" } <br/>   else {var newStatus = "Open" } ;</pre>
+			<pre class="code small">9. edit["Status"] = newStatus ;</pre>
+			<pre class="code small">10. edit["-modid"] = recordModId ;</pre>
+			<pre class="code small">11. // edit is now { "-recid" : recid , "-modid" : "recordModId" , "Status" : newStatus }</pre>
+			<pre class="code small">12. fmxj.postQueryFMS ( edit , callBackFunction )</pre>
+		</div>
+	</div>
+	<div>
+		<button id="editbtn" class="shadow">try</button>
+		<span>&nbsp</span>
+		<span>uses the data in example 2.1, so make sure that's populated first!</span>
+	</div>
+	<div class="pad shadow tall">
+		<pre id="edit" class="result"></pre>
+	</div>
+	<div class="small">example 3.2: Create a new FileMaker record by not specifying the -recid in the edit object.  If the record creation is succesful on the server, the full object/record will be returned and added to the bottom of the array displayed above in example 2.1.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="new" class="code small indent"></pre>
+			<pre class="code small">2. var url = fmxj.editRecordURL ( "Events" , "Events" , newRecord )</pre>
+			<pre class="code small">3. fmxj.postQueryFMS ( url , callBackFunction )</pre>
+		</div>
+	</div>
+	<div>
+		<button id="newbtn" class="shadow">try</button>
+	</div>
+	<div class="pad shadow tall">
+		<pre id="newrecord" class="result"></pre>
+	</div>
+	
+	<div class="separator"></div>
+	<div class="function">deleteRecordURL ( fileName , layoutName , recid )</div>
+	<div class="small">Create a FileMaker -delete query url from record id.</div>
+	<div class="pad shadow">		
+		<div class="line">
+			<span class="label">fileName:</span>
+			<span class="desc">String: Name of the hosted FileMaker file.</span>
+		</div>
+		<div class="line">
+			<span class="label">layoutName:</span>
+			<span class="desc">String: Name of the target layout on the specified hosted FileMaker file.</span>
+		</div>
+		<div class="line">
+			<span class="label">recid:</span>
+			<span class="desc">Number: The FileMaker record id. Can be accessed from an object's -recid property.</span>
+		</div>
+	</div>
+	<div class="small">example 4.1: Delete a FileMaker record based on the last object of the current array.  If succesfully deleted on the server, the object will be removed from the current array.  Error codes are always returned for the delete queries, with "0" meaning a succesful delete.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre class="code small">1. //get the -recid of the last object in the array.</pre>
+			<pre class="code small">1. var recid = source[source.length-1][-recid];</pre>
+			<pre class="code small">2. var url = fmxj.deleteRecordURL ( "Events" , "Events" , recid )</pre>
+			<pre class="code small">3. fmxj.postQueryFMS ( url , callBackFunction )</pre>
+		</div>
+	</div>
+	<div>
+		<button id="deletebtn" class="shadow">try</button>
+		<span>&nbsp</span>
+		<span>deletes the last object in example 2.1 so make sure that's populated.</span>
+	</div>
+	<div class="pad shadow">
+		<pre id="deleterecord" class="result"></pre>
+	</div>
+	
+	<div class="separator"></div>
+	<div class="function">filterObjects ( filters , searchTypes , source )</div>
+	<div class="small">Apply complex property filters to an array of objects using the request syntax.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<span class="label">filters:</span>
+			<span class="desc">Array of Objects: Each object represents a "FileMaker Type" request.</span>
+		</div>
+		<div class="line">
+			<span class="label">dataTypes:</span>
+			<span class="desc">Object: Specifies the standard search type to use for the specified property. Supported types are: "contains","startswith" and "equals".  "startswith" is the default if not specified.</span>
+		</div>
+		<div class="line">
+			<span class="label">source:</span>
+			<span class="desc">Array of Objects: Objects to be filtered.</span>
+		</div>
+	</div>
+	<div class="small">example 5.1:  Filter the current array of objects based on a filter object made of FileMaker type find requests.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="filter" class="code small indent"></pre>
+			<pre class="code small">2. var types = {"id":"equals"};</pre>
+			<pre class="code small">3. fmxj.filterObjects ( filterObj , types , source )</pre>
+		</div>
+	</div>
+	<div>
+		<button id="filterbtn" class="shadow">filter</button>
+		<span>&nbsp</span>
+		<button id="revertfilterbtn" class="shadow">revert</button>
+		<span>&nbsp</span>
+		<span id="filterCount"></span>
+	</div>
+	<div class="pad shadow">
+		<pre id="filterResult" class="result tall"></pre>
+	</div>
+	
+	<div class="separator"></div>
+	<div class="function">sortObjects ( sortOrder , dataTypes ,  source )</div>
+	<div class="small">Sort an array of objects by multiple properties.</div>	
+	<div class="pad shadow">
+		<div class="line">
+			<span class="label">sortOrder:</span>
+			<span class="desc">Object: Specifies sort properties and sort order.</span>
+		</div>
+		<div class="line">
+			<span class="label">dataTypes:</span>
+			<span class="desc">Object: Specifies the data type to use for the specified property. Unspecified properties are treated as Strings.</span>
+		</div>
+		<div class="line">
+			<span class="label">source:</span>
+			<span class="desc">Array of Objects: Objects to be sorted.</span>
+		</div>
+	</div>
+	<div class="small">example 6.1: Filter an array of objects by 1-n properties.  Specify an object of properties and their sort orders.  Also specify an object defining the data type to use to sort the specified properties.  Supported data types are: String, Number, Date/Timestamp and Time.  Unspecified properties are sorted as Strings.</div>
+	<div class="pad shadow">
+		<div class="line">
+			<pre id="sortJs" class="code small indent"></pre>
+			<pre id="sortTypes" class="code small indent"></pre>
+			<pre class="code small">3. fmxj.sortObjects ( sort , dataTypes , source )</pre>
+		</div>
+	</div>
+	<div>
+		<button id="sortJsbtn" class="shadow">sort</button>
+		<span>&nbsp</span>
+		<button id="revertSortJsbtn" class="shadow">revert</button>
+		<span>&nbsp</span>
+		<span id="sortJsCount"></span>
+	</div>
+	<div class="pad shadow">
+		<pre id="sortJsResult" class="result tall"></pre>
+	</div>
+	
+	<div class="separator"></div>
+
+	
+</body>
+
+<footer>
+	
+	<script>
+	
+	//simple function for updating innerhtml of specified element. json flag means we're passing a json object, so stringify and prettify.
+	var updateElement = function( elementId, a , json ){
+		if(json){var txt = JSON.stringify(a,null,4)} else {var txt = a};
+		document.getElementById(elementId).innerHTML =  txt;
+	};
+	
+	//function for updating source json displays
+	var updateSource = function(js){
+		var display = 100;
+		var clone = function(a){return JSON.parse(JSON.stringify(a));};
+		source = js;
+		sourceFilter = clone(source);
+		sourceSort = clone(source);
+		var sourceDisplay = source.slice(0,display);
+		updateElement ("findResult",sourceDisplay,true);
+		updateElement ("filterResult",sourceDisplay,true);
+		updateElement ("sortJsResult",sourceDisplay,true);
+		var countMessage = "Displaying " + display + " \"stringified\" objects of " + source.length + " total objects returned."
+		updateElement ("count", countMessage, false);
+		updateElement ("filterCount", countMessage, false);
+		updateElement ("sortJsCount", countMessage, false);
+	};
+	
+	//global array of objects for demo.
+	var source = [];
+	var sourceFilter = [];
+	var sourceSort = [];
+	
+	//sample data
+	
+	//each object in the array represents a find request
+	//standard calendar view requests
+	var requests = 
+			[
+				{"DateStart":"<=2/28/2014", "DateEnd":">=2/1/2014"},
+				{"DateStart":"2/1/2014...2/28/2014"}
+			] ;
+			
+	// flgging the -omit property of a request with 1 designates it as an omit request.
+	var requestsOmit = 
+			[
+				{"DateStart":"<=2/28/2014","DateEnd":">=2/21/2014"},
+				{"DateStart":"2/1/2014...2/28/2014"},
+				{"Resource":"Example B","-omit":1}
+			] ;
+	
+	// object for new record. Don't specify -recid property.
+	var newRecord =
+		    {
+		      	"DateEnd": "02/25/2014",
+		      	"DateStart": "02/25/2014",
+		      	"Description": "test",
+		     	"Status": "Open",
+		     	"Summary": "test summary ubi"
+		    };
+	
+	//global sort Object display value
+	var sortObject =
+		 	{
+			 "field1": "DateStart","order1": "descend",
+			 "field2": "id", "order2": "ascend" 
+	   	 	};
+			
+	//global filter Object display value
+	var filterObj =
+		 	[
+				{"id":"E4B04F12-E006-4928-A1E0-0E86EDF5641C","Status":"Open"},
+				{"id":"463BBEA9-404B-4979-8CC0-6F8F60EB0154"},
+				{"id":"8CDA64C4-643D-4A64-9336-83BEF07F0CF4"}
+			];
+			
+	//global sort Object display value
+	var sortObjectJs =
+		 	{
+			"field1":"Resource",
+			"order1" : "ascend",
+		 	"field2" : "DateStart",
+			"order2" : "descend" 
+	   	 	};
+			
+	var sortTypes =
+		 	{
+			"Resource" : "String",
+		 	"DateStart": "Date" 
+	   	 	};
+			
+	//end sample data
+			
+	//set requests into code pres as stringified json
+	var queryJson = JSON.stringify ( requests , null , " " );
+	document.getElementById("requests").innerHTML =  "1. var requests = " + queryJson + ";";
+	
+	var queryJsonOmit = JSON.stringify ( requestsOmit , null , " " );
+	document.getElementById("requestsOmit").innerHTML =  "1. var requests = " + queryJsonOmit + ";";
+	
+	var queryJsonSort = JSON.stringify ( sortObject , null , " " );
+	document.getElementById("sort").innerHTML =  "1. var sort = " + queryJsonSort + ";";
+	
+	var queryJsonNew = JSON.stringify ( newRecord , null , " " );
+	document.getElementById("new").innerHTML =  "1. var newRecord = " + queryJsonNew + ";";
+	
+	var queryJsonfilter = JSON.stringify ( filterObj , null , " " );
+	document.getElementById("filter").innerHTML =  "1. var filterObj = " + queryJsonfilter + ";";
+	
+	var queryJsonSortJs = JSON.stringify ( sortObjectJs , null , " " );
+	document.getElementById("sortJs").innerHTML =  "1. var sort = " + queryJsonSortJs + ";";
+	
+	var queryJsonSortTypes = JSON.stringify ( sortTypes , null , " " );
+	document.getElementById("sortTypes").innerHTML =  "2. var dataTypes = " + queryJsonSortTypes + ";";
+	
+	//now clear, we reset if/when sort button clicked.
+	sortObject = null;
+	
+	//set relay to null if hosting everything on your FMS and using XML directly
+	//var relay = null;
+	
+	//define PHP relay info if using
+	//Test server with Events and Contacts on Foxtail Tech server.
+	var relay = {"php":"fmxjRelay.php","server":"sc-fms13-fms.fmsdb.com","protocol":"https","port":"443"};
+	
+	
+	//buttons
+	var e = "";
+		
+	//button for running findRecordsURL and getting xml url
+	var btnxml = document.getElementById("getfindxml");
+	btnxml.addEventListener("click",function(){
+		requests =[{"DateStart":"<=2/28/2014", "DateEnd":">=2/21/2014"},{"DateStart":"2/1/2014...2/28/2014"}];
+		//clear sort 	
+		sortObject =null;
+		document.getElementById("xmlfind").innerHTML =  "" ;
+		document.getElementById("xmladdfind").innerHTML =  "" ;
+		document.getElementById("xmlomitfind").innerHTML =  "" ;
+		document.getElementById("xmlsort").innerHTML =  "" ;
+		var url = fmxj.findRecordsURL( "Events" , "Events" , requests ) ;
+		document.getElementById("xmlfind").innerHTML =  url ;
+		
+	});
+	
+	//button for running findRecordsURL to add criteria and getting xml url
+	var btnaddxml = document.getElementById("addfindxml");
+	btnaddxml.addEventListener("click",function(){
+		requests =[{"DateStart":"<=2/28/2014", "DateEnd":">=2/21/2014"},{"DateStart":"2/1/2014...2/28/2014"}];
+		//clear sort 	
+		sortObject =null;
+		//append criteria to requests array.
+		requests[0]["Resource"] = "Example C";
+		requests[1]["Resource"] = "Example C";
+		document.getElementById("xmlfind").innerHTML =  "" ;
+		document.getElementById("xmladdfind").innerHTML =  "" ;
+		document.getElementById("xmlomitfind").innerHTML =  "" ;
+		document.getElementById("xmlsort").innerHTML =  "" ;
+		var url = fmxj.findRecordsURL( "Events" , "Events" , requests ) ;
+		document.getElementById("xmladdfind").innerHTML =  url ;
+	});
+	
+	//button for running findRecordsURL to omit request and getting xml url
+	var btnomitxml = document.getElementById("omitfindxml");
+	btnomitxml.addEventListener("click",function(){
+		//clear sort 	
+		sortObject =null;
+		//append criteria to requests array.
+		requests = requestsOmit;
+		document.getElementById("xmlfind").innerHTML =  "" ;
+		document.getElementById("xmladdfind").innerHTML =  "" ;
+		document.getElementById("xmlomitfind").innerHTML =  "" ;
+		document.getElementById("xmlsort").innerHTML =  "" ;
+		var url = fmxj.findRecordsURL("Events" , "Events" , requests ) ;
+		document.getElementById("xmlomitfind").innerHTML =  url ;
+	});
+	
+	
+	//button for running findRecordsURL with sort and getting query url
+	var btnsort = document.getElementById("sortbtn");
+	btnsort.addEventListener("click",function(){
+		//append criteria to requests array.
+	 	sortObject = {
+		 "field1": "DateStart","order1": "descend",
+		 "field2": "id", "order2": "ascend" 
+   	 	};
+		document.getElementById("xmlfind").innerHTML =  "" ;
+		document.getElementById("xmladdfind").innerHTML =  "" ;
+		document.getElementById("xmlomitfind").innerHTML =  "" ;
+		document.getElementById("xmlsort").innerHTML =  "" ;
+		var url = fmxj.findRecordsURL("Events" , "Events" , requests , sortObject ) ;
+		document.getElementById("xmlsort").innerHTML =  url ;
+	});
+
+	
+	//button for running query and converting xml results to javascript objects
+	var btn = document.getElementById("btnjson");
+	btn.addEventListener("click",function(){
+		var url = fmxj.findRecordsURL( "Events" , "Events" , requests , sortObject ) ;
+		//callback functions for writing results to divs
+		var writeDownload = function ( n ) {
+			document.getElementById("findResult").innerHTML += "downloading results " + n + "\n" ;
+		} ;
+		updateElement("findResult","POST: " + url + "</br></br>",false);
+		updateElement("count",null,false);
+		fmxj.postQueryFMS(url,updateSource,writeDownload,relay);
+		
+	});
+		
+	//button for running query and converting xml results to javascript objects
+	var btnContact = document.getElementById("btncontact");
+	btnContact.addEventListener("click",function(){
+		var contactRequests = [{"Status":"Customer"}];
+		var url = fmxj.findRecordsURL("Contacts" , "Contacts" , contactRequests  ) ;
+		//callback functions for writing results to divs
+		var writeResults = function(js){
+			var countMessage = "Displaying " + js.length + " \"stringified\" objects of " + js.length + " total objects returned."
+			updateElement ("contactcount", countMessage, false);
+			updateElement ("contactresult", js , true);
+		};
+		var writeDownload = function ( n ) {
+			document.getElementById("contactresult").innerHTML += "downloading results " + n + "\n" ;
+		} ;
+		updateElement("contactresult","POST: " + url + "</br></br>",false);
+		updateElement("contactcount",null,false);
+		fmxj.postQueryFMS(url,writeResults,writeDownload,relay);
+	}) 
+		
+	//button for running query and converting xml results to javascript objects with intentional error
+	var btnerror = document.getElementById("errorbtn");
+	btnerror.addEventListener("click",function(){
+		var urlError = fmxj.findRecordsURL( "Events" , "ShmEvents" , requests ) ;
+		//callback function for writing results to div
+		var writeResults = function ( js ) {
+				var txt = JSON.stringify(js , null , 4 );
+				document.getElementById("error").innerHTML = txt;
+		} ;
+		document.getElementById("error").innerHTML =  "" ;
+		fmxj.postQueryFMS(urlError,writeResults,null,relay);
+	});
+	
+	//button for editing the first object in the array
+	var btnedit = document.getElementById("editbtn");
+	btnedit.addEventListener("click",function(){
+		document.getElementById("edit").innerHTML =  "" ;
+		if(!source[0]){alert("Missing source data.  Please populate data in result 2.0 under postQueryFMSon()");return "error";}
+		var writeResults = function ( js ) {
+			var txt = JSON.stringify(js[0] , null , 4 );
+			document.getElementById("edit").innerHTML =  txt ;
+			if (!js[0]["ERRORCODE"]){
+				//update global object and display
+				source[0] = js[0];
+				updateSource(source);
+			}
+		} ;
+		var firstRecord = source[0];
+		var recid = firstRecord["-recid"];
+		var recordStatus = firstRecord["Status"] ;
+		var recordModId = firstRecord["-modid"] ;
+		//create edit object and requests array
+		var edit = {"-recid":recid};
+		var requests = [edit];
+		//toggle status
+		if ( recordStatus == "Open" ) {var newStatus = "Closed" } else {var newStatus = "Open" } ;
+		edit["Status"] = newStatus ;
+		edit["-modid"] = recordModId ;
+		var url = fmxj.editRecordURL.call( e , "Events" , "Events" , edit ) ;
+		fmxj.postQueryFMS(url,writeResults,null,relay)
+	});
+	
+	//button for new record
+	var btnnew = document.getElementById("newbtn");
+	btnnew.addEventListener("click",function(){
+		document.getElementById("newrecord").innerHTML =  "" ;
+		var writeResults = function ( js ) {
+			var txt = JSON.stringify(js[0] , null , 4 );
+			document.getElementById("newrecord").innerHTML =  txt ;
+			if (!js[0]["ERRORCODE"]){
+				source.push(js[0]);
+				updateSource(source);
+			}
+		} ;
+		var url = fmxj.editRecordURL.call( e , "Events" , "Events" , newRecord ) ;
+		fmxj.postQueryFMS(url,writeResults,null,relay)
+	});
+	
+	//button to delete last object in array
+	var btndelete = document.getElementById("deletebtn");
+	btndelete.addEventListener("click",function(){
+		var i = source.length-1;
+		if(!source[i]){alert("Missing source data.  Please populate data in result 2.0 under postQueryFMSon()");return "error";}
+		var recid = (source[i]["-recid"]);
+		document.getElementById("deleterecord").innerHTML =  "" ;
+		var writeResults = function ( js ) {
+			var txt = JSON.stringify(js[0] , null , 4 );
+			document.getElementById("deleterecord").innerHTML =  txt ;
+			if (js[0]["ERRORCODE"]==0){
+				source.splice(i,1);
+				document.getElementById("newrecord").innerHTML =  "" ;
+				updateSource(source); ;
+			}
+		} ;
+		var url = fmxj.deleteRecordURL.call( e , "Events" , "Events" , recid ) ;
+		fmxj.postQueryFMS(url,writeResults,null,relay)
+	});
+	
+	//button to filter source
+	var btnfilter = document.getElementById("filterbtn");
+	btnfilter.addEventListener("click",function(){
+		var current = document.getElementById("filterResult").innerHTML;
+		if(!current){alert("Missing source data.  Please populate data in result 2.0 under postQueryFMSon()");return "error";}
+		var result = fmxj.filterObjects(filterObj,{"id":"EQUALS"},sourceFilter);
+		document.getElementById("filterResult").innerHTML = JSON.stringify(result,null,4);
+		document.getElementById("filterCount").innerHTML = result.length + " objects found.";
+	});
+	
+	//button to revert filter source
+	var btnFilterRevert = document.getElementById("revertfilterbtn");
+	btnFilterRevert.addEventListener("click",function(){updateSource(source);});
+	
+	//button to revert filter source
+	var btnFilterRevert = document.getElementById("revertfilterbtn");
+	btnFilterRevert.addEventListener("click",function(){updateSource(source);});
+		
+	//button to filter source
+	var btnSortJs = document.getElementById("sortJsbtn");
+	btnSortJs.addEventListener("click",function(){
+		var current = document.getElementById("sortJsResult").innerHTML;
+		if(!current){alert("Missing source data.  Please populate data in result 2.0 under postQueryFMSon()");return "error";}
+		fmxj.sortObjects(sortObjectJs,{"Resource":"String","DateStart":"Date"},sourceSort);
+		var display = sourceSort.slice(0,100);
+		document.getElementById("sortJsResult").innerHTML = JSON.stringify(display,null,4);
+	});
+	
+	//button to revert filter source
+	var btnSortRevert = document.getElementById("revertSortJsbtn");
+	btnSortRevert.addEventListener("click",function(){updateSource(source);});
+	
+	//button to filter source
+	var btngh = document.getElementById("ghub");
+	btngh.addEventListener("click",function(){
+		var url = "https://github.com/seedcode/fmxj";
+		window.open(url);
+	});
+	
+	
+	
+	
+	
+	</script>
+
+</footer>
+
+</html>
