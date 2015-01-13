@@ -6,3 +6,5 @@ With fmxj.js and simple Javascript Objects you can
 * Return FileMaker parent and child as JSON
 * Create, edit and delete FileMaker records
 * Filter and sort Javascrip objects locally with complex criteria.
+
+fmxj.js is designed to do most of the data interchange work in JavaScript.  Query strings are created using JavaScript Objects and then POSTED to FileMaker's XML Web Publishing Engine.  An XML FMPXMLRESULT is returned and converted into JavaScript Objects/JSON by a JavaScript function.  POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP relay can be used to get around cross-domain issues and provide more authentication options.
