@@ -1,5 +1,5 @@
-## fmxj.js
-# A Javascript approach to FileMaker Custom Web Publishing
+#fmxj.js
+##A Javascript approach to FileMaker Custom Web Publishing
 
 With fmxj.js and simple Javascript Objects you can
 * Build complex queries and POST them to FileMaker Server
