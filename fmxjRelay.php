@@ -23,7 +23,9 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  ini_set("display_errors" , false );
  
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept');
 header('Content-Type: application/xml');
+
 
 //constants
 //this shouldn't change.  fmxj.convertXml2js() Is Expecting FMPXMLRESULT
