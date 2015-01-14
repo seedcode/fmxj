@@ -1,5 +1,5 @@
 #fmxj.js
-##A Javascript approach to FileMaker Custom Web Publishing
+###A Javascript based approach to FileMaker Custom Web Publishing
 
 ###With fmxj.js and simple JavaScript Objects you can
 
@@ -13,16 +13,14 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
 ##Functions for working with FileMaker Server
+The **postQueryFMS** is the primary function used for POSTing query to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
 **postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
-
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
 * **callBackOnDownload:** (optional) function: The handler function for the returned array of objects.
 * **phpRelay:** (optional) object: specifies the server address and name of the php relay file being used.
-
-The **postQueryFMS** is the primary function used for POSTing query to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.  
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
@@ -112,7 +110,6 @@ An optional handler function can be passed as well to report the download progre
     }
 ]
 ```
-
 
 **Deployment and the phpRelay**
 
@@ -264,6 +261,7 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ...which can now be passed to **postQueryFMS**.
 
 ###Functions for working with JavaScript Objects
+Additional functions for handling your objects in JavaScript
 ***
 
 ***Coming Soon!***
