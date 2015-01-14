@@ -13,7 +13,6 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
 ##Functions for working with FileMaker Server
-
 **postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
 
 * **query:** string: The query, built by one of the fmxj URL functions
@@ -25,7 +24,7 @@ The **postQueryFMS** is the primary function used for POSTing query to FileMaker
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
-**Example of formatted results (stringified JSON) returned by postQueryFMS**
+**Example of formatted results (stringified JSON) returned by the postQueryFMS function:**
 
 ```json
 [
@@ -160,7 +159,7 @@ var relay = {"php":"fmxjRelay.php","server":"seedcode.com","protocol":"https","p
 ###Query building functions
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
-
+##  
 **findRecordsURL ( fileName, layoutName, requests [, sort, max, skip] )**
 
 * **fileName:** string: The target FileMaker file
@@ -198,7 +197,7 @@ var requests = [{"Resources":"Example A","-omit":"1"}];
 
 Will generate a query for omiting all the records where the Resource is equal to Example A.
 
-
+##   
 **editRecordURL ( fileName, layoutName, editObj )**
 
 * **fileName:** string: The target FileMaker file
@@ -240,6 +239,7 @@ var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );
 
 ...these queries can now be passed to **postQueryFMS**.
 
+##   
 **deleteRecordURL ( fileName, layoutName, recid )**
 
 * **fileName:** string: The target FileMaker file
