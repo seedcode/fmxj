@@ -46,7 +46,7 @@ User name and password can be passed as part of the object.  They are sent via P
 
 ```javascript
 //create two objects in a JSON array, each one is a FileMaker Find Request
-var requests = [{"Resources":"Example A"},{"Resources":"Example B"}]
+var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];
 
 //build query from our array
 var query = fmxj.findRecordsURL ( "Events" , "Events" , requests ); 
@@ -73,17 +73,17 @@ These three functions are used to build the specific query type strings for the 
 
 **Example**
 
-1. `//create two objects in a JSON array, each one is a FileMaker Find Request. `
-2. `//will find all records with Resources = Example A or Example B.            `
-3. `                                                                            `
-4. `var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];       `
-5. `                                                                            `
-6. `// we want to sort these by StartDate, so create an Object for that         `
-7. `                                                                            `
-8. `var sort = {"StartDate":"ascend"}                                           `
-9. `                                                                            `
-7. `//build query from our array, our file and layout name are "Events"         `
-8. `var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );  `
+```javascript
+//create two objects in a JSON array, each one is a FileMaker Find Request.
+//will find all records with Resources = Example A OR Resources = Example B.
+var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];
+
+// we want to sort these by StartDate, so create an Object for that 
+var sort = {"StartDate":"ascend"};
+
+//build query from our array, our file and layout name are "Events"
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
+```
 
 **Returns:**
 
@@ -93,7 +93,9 @@ These three functions are used to build the specific query type strings for the 
 
 To specify a request as an **Omit** request, simply specify an -omit property in the object as 1, e.g.
 
-`var requests = [{"Resources":"Example A","-omit":"1"}];`
+```javascript
+var requests = [{"Resources":"Example A","-omit":"1"}];
+```
 
 Will generate a query for omiting all the records where the Resource is equal to Example A.
 
@@ -110,13 +112,14 @@ If the -recid property is not specified, then this function will create a -new q
 
 **-edit Example**
 
-1. `//Edit the Resource value of the record with a -recid of 6198.        `
-2. `//Edit the value to Example A                                         `
-3. `                                                                      `
-4. `var edit = {"-recid":"6198","Resources":"Example A"};                 `
-5. `                                                                      `
-6. `//build query from our object, our file and layout name are "Events"  `
-7. `var query = fmxj.editRecordURL ( "Events" , "Events" , edit );        `
+```javascript
+//Edit the Resource value of the record with a -recid of 6198.
+//Edit the value to Example A 
+var edit = {"-recid":"6198","Resources":"Example A"};
+
+//build query from our object, our file and layout name are "Events"
+var query = fmxj.editRecordURL ( "Events" , "Events" , edit );
+```
 
 **Returns:**
 
@@ -124,13 +127,13 @@ If the -recid property is not specified, then this function will create a -new q
 
 **-new Example**
 
+```javascript
+//Create a new record with Resources set to Example A and StartDate = to 1/11/2015
+var newRecord = {"Resources":"Example A","StartDate":"1/11/2015"};
 
-1. `//Create a new record with Resources set to Example A and StartDate = to 1/11/2015`
-3. `                                                                                  `
-4. `var newRecord = {"Resources":"Example A","StartDate":"1/11/2015"};                `
-5. `                                                                                  `
-6. `//build query from our object, our file and layout name are "Events"              `
-7. `var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );               `
+//build query from our object, our file and layout name are "Events"
+var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );    
+```
 
 **Returns:**
 
@@ -146,10 +149,13 @@ If the -recid property is not specified, then this function will create a -new q
 
 This function will create a -delete query for a FileMaker record with the specified -recid property.
 
-1. `//Delete the record with a -recid of 6198.                           `
-2. `//build query from our recid, our file and layout name are "Events"  `
-3. `                                                                     `
-4. `var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );     `
+**-delete Example**
+
+```javascript
+//Delete the record with a -recid of 6198.
+//build query from our recid, our file and layout name are "Events"
+var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
+```
 
 **Returns:**
 
