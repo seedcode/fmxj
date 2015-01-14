@@ -13,6 +13,8 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
 ##Functions for working with FileMaker Server
+
+***
 **postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
 
 * **query:** string: The query, built by one of the fmxj URL functions
@@ -155,7 +157,6 @@ var relay = {"php":"fmxjRelay.php","server":"seedcode.com","protocol":"https","p
 **Remember!**  Both the Web Server and the FileMaker Server need to be runnning SSL for this transaction to be secure.  There's a good article on this [here](http://www.troyhunt.com/2013/05/your-login-form-posts-to-https-but-you.html).
 
 ##Query Building Functions
-***
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
 
@@ -197,8 +198,7 @@ var requests = [{"Resources":"Example A","-omit":"1"}];
 
 Will generate a query for omiting all the records where the Resource is equal to Example A.
 
-##  
-
+***
 **editRecordURL ( fileName, layoutName, editObj )**
 
 * **fileName:** string: The target FileMaker file
@@ -240,8 +240,7 @@ var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );
 
 ...these queries can now be passed to **postQueryFMS**.
 
-##  
-
+***
 **deleteRecordURL ( fileName, layoutName, recid )**
 
 * **fileName:** string: The target FileMaker file
