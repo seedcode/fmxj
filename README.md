@@ -46,8 +46,17 @@ User name and password can be passed as part of the object.  They are sent via P
 
 ```javascript
 //create two objects in a JSON array, each one is a FileMaker Find Request
-```
+var requests = [{"Resources":"Example A"},{"Resources":"Example B"}]
 
+//build query from our array
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests ); 
+
+//specify FileMaker Server we're posting to
+var relay = {"php":"fmxjRelay.php","server":"seedcode.com"};  
+
+//now do the POST (without any on Download handler);
+fmxj.postQueryFMS ( query , onReadyFunction , null , relay ); 
+```
 
 ###Query building functions
 
