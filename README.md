@@ -14,7 +14,7 @@ Working examples and basic function descriptions are available at the <a href="h
 
 ##Functions for working with FileMaker Server
 
-###postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )
+**postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
 
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
@@ -57,7 +57,7 @@ User name and password can be passed as part of the object.  They are sent via P
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
 
-###findRecordsURL ( fileName, layoutName, requests [, sort, max, skip] )
+**findRecordsURL ( fileName, layoutName, requests [, sort, max, skip] )**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
@@ -82,7 +82,7 @@ These three functions are used to build the specific query type strings for the 
 
 **Returns:**
 
-```-db=Events&-lay=Events&-query=(q1);(q3)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=Resources&-sortorder.1=ascend&-findquery```
+-db=Events&-lay=Events&-query=(q1);(q3)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=Resources&-sortorder.1=ascend&-findquery
 
 ...which can now be passed to **postQueryFMS**.
 
@@ -93,7 +93,7 @@ To specify a request as an **Omit** request, simply specify an -omit property in
 Will generate a query for omiting all the records where the Resource is equal to Example A.
 
 
-###editRecordURL ( fileName, layoutName, editObj )
+**editRecordURL ( fileName, layoutName, editObj )**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
@@ -115,7 +115,7 @@ If the -recid property is not specified, then this function will create a -new q
 
 **Returns:**
 
-```-db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit```
+-db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit
 
 **-new Example**
 
@@ -129,11 +129,11 @@ If the -recid property is not specified, then this function will create a -new q
 
 **Returns:**
 
-```-db=Events&-lay=Events&Resources=Example A&StartDate=1/11/2015&-new```
+-db=Events&-lay=Events&Resources=Example A&StartDate=1/11/2015&-new
 
 ...these queries can now be passed to **postQueryFMS**.
 
-###deleteRecordURL ( fileName, layoutName, recid )
+**deleteRecordURL ( fileName, layoutName, recid )**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
@@ -148,11 +148,11 @@ This function will create a -delete query for a FileMaker record with the specif
 
 **Returns:**
 
-```-db=Events&-lay=Events&-recid=6198&-delete```
+-db=Events&-lay=Events&-recid=6198&-delete
 
 ...which can now be passed to **postQueryFMS**.
 
-##Functions for working with JavaScript Objects
+###Functions for working with JavaScript Objects
 
 ***Coming Soon!***
 
