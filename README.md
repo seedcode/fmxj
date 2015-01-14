@@ -25,6 +25,94 @@ The **postQueryFMS** is the primary function used for POSTing query to FileMaker
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
+**Example of formatted results (stringified JSON) returned by postQueryFMS**
+
+```json
+[
+    {
+        "-recid": "6198",
+        "-modid": "116",
+        "DateEnd": "02/09/2014",
+        "DateStart": "02/09/2014",
+        "Description": "",
+        "id": "7A2E442C-3782-497F-A539-4495F1B28806",
+        "id_contact": "ED3C1292-EBC2-4027-82D2-33ADFB590A1D",
+        "id_Phase": "",
+        "id_Project": "P00031",
+        "Resource": "Example A",
+        "Status": "Open",
+        "Summary": "Begin Production",
+        "TimeEnd": "",
+        "TimeStart": "",
+        "z_LinkedWithinProject": "1",
+        "z_MilestoneSort": "",
+        "z_Notified": "",
+        "z_Repeating_id": ""
+    },
+    {
+        "-recid": "6199",
+        "-modid": "5",
+        "DateEnd": "02/10/2014",
+        "DateStart": "02/10/2014",
+        "Description": "",
+        "id": "D546B0FF-E87C-41CD-8B1C-A3B291E7FCCD",
+        "id_contact": "2C2CD8FB-EFD9-44E9-91B0-884C01D887EB",
+        "id_Phase": "",
+        "id_Project": "P00031",
+        "Resource": "Example B",
+        "Status": "Open",
+        "Summary": "Begin Production",
+        "TimeEnd": "",
+        "TimeStart": "",
+        "z_LinkedWithinProject": "1",
+        "z_MilestoneSort": "",
+        "z_Notified": "",
+        "z_Repeating_id": ""
+    },
+    {
+        "-recid": "6201",
+        "-modid": "4",
+        "DateEnd": "02/12/2014",
+        "DateStart": "02/12/2014",
+        "Description": "",
+        "id": "9F86C241-8A64-4B82-9B58-CEB5131FA125",
+        "id_contact": "D4C1F32F-C2D5-4584-947C-4F409502C157",
+        "id_Phase": "",
+        "id_Project": "P00031",
+        "Resource": "Example D",
+        "Status": "Open",
+        "Summary": "Begin Production",
+        "TimeEnd": "",
+        "TimeStart": "",
+        "z_LinkedWithinProject": "1",
+        "z_MilestoneSort": "",
+        "z_Notified": "",
+        "z_Repeating_id": ""
+    },
+    {
+        "-recid": "6202",
+        "-modid": "4",
+        "DateEnd": "02/13/2014",
+        "DateStart": "02/13/2014",
+        "Description": "",
+        "id": "729C0926-6CBB-46AF-913D-67AE489056FA",
+        "id_contact": "E7CA4DFA-2AFA-4756-80E0-C0E157A6E876",
+        "id_Phase": "",
+        "id_Project": "P00031",
+        "Resource": "Example E",
+        "Status": "Open",
+        "Summary": "Begin Production",
+        "TimeEnd": "",
+        "TimeStart": "",
+        "z_LinkedWithinProject": "1",
+        "z_MilestoneSort": "",
+        "z_Notified": "",
+        "z_Repeating_id": ""
+    }
+]
+```
+
+
 **Deployment and the phpRelay**
 
 You can use fmxj without any PHP providing all the JavaScript is hosted on the FileMaker Server.  In this case, the JavaScript will do the httpXMLRequest POST directly to FileMaker Server's XML API.  If the Guest account is not enabled then you will be prompted for FileMaker authentication from the browser.  This is simple **Basic Authentication**, so may not be suitable for your deployment.  If you're using this deployment, you can simply not pass the optional **phpRelay** argument or pass **null** to it.
@@ -42,7 +130,7 @@ You will need to use the php Relay if your web server and Filemaker server are l
 
 User name and password can be passed as part of the object.  They are sent via POST, so can be potentially be secured if both the web server and Filemaker Server have SSL certs, otherwise passing the credentials like this is equivalent to **Basic Authentication**.  You also have the option of hardcoding the FileMaker credentials in the PHP file so they're not passed via JavaScript at all.  Providing your users are logging into the Web Server in a secure way, this might be an acceptable approach.
 
-**Example**
+**Examples**
 
 ```javascript
 //create two objects in a JSON array, each one is a FileMaker Find Request
@@ -55,8 +143,19 @@ var query = fmxj.findRecordsURL ( "Events" , "Events" , requests );
 var relay = {"php":"fmxjRelay.php","server":"seedcode.com"};  
 
 //now do the POST (without any on Download handler);
-fmxj.postQueryFMS ( query , onReadyFunction , null , relay ); 
+fmxj.postQueryFMS ( query , onReadyFunction , null , relay );
 ```
+
+POSTING FileMaker credentials to a secure server would use an object like this:
+
+```javascript
+//specify FileMaker https Server we're posting to with credentials
+var relay = {"php":"fmxjRelay.php","server":"seedcode.com","protocol":"https","port":"443","user":varUser,"pass":varPass};
+```
+
+**Remember!**  Both the Web Server and the FileMaker Server need to be runnning SSL for this transaction to be secure.  There's a good article on this [here](http://www.troyhunt.com/2013/05/your-login-form-posts-to-https-but-you.html).
+
+
 
 ###Query building functions
 
@@ -78,8 +177,8 @@ These three functions are used to build the specific query type strings for the 
 //will find all records with Resources = Example A OR Resources = Example B.
 var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];
 
-// we want to sort these by StartDate, so create an Object for that 
-var sort = {"StartDate":"ascend"};
+// we want to sort these by StartDate descending and Resource ascending, so create an Object to define that. 
+var sort = {"field1":"DateStart","sort1":"ascend","field2":"Resource","sort2":"descend"};
 
 //build query from our array, our file and layout name are "Events"
 var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
