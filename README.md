@@ -1,7 +1,7 @@
 #fmxj.js
 ##A Javascript approach to FileMaker Custom Web Publishing
 
-##With fmxj.js and simple JavaScript Objects you can
+###With fmxj.js and simple JavaScript Objects you can
 
 * Build complex queries and POST them to FileMaker Server
 * Return FileMaker parent and child records as JavaScript Objects/JSON
@@ -12,7 +12,9 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
-###`postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )`
+##Functions for working with FileMaker Server
+
+###postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )
 
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
@@ -53,17 +55,106 @@ User name and password can be passed as part of the object.  They are sent via P
 
 ###Query building functions
 
-These functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
+These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
 
-###`findRecordsURL ( fileName, layoutName, requests [, sort, max, skip] )`
+###findRecordsURL ( fileName, layoutName, requests [, sort, max, skip] )
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
 * **requests:** array of objects: Each object in the array represents a FileMaker find request
-* **sort:** (optional) object: Specifies a sort order for the query
+* **sort:** (optional) object: Specifies a sort order for the query, options are ascend, descend or value list name
 * **max:** (optional) number: The maximum number of records/objects to return
 * **skip:** (optional) object: The number of rows to skip (like offset) before returning records/objects
 
+**Example**
+
+1. `//create two objects in a JSON array, each one is a FileMaker Find Request.`
+2. `//will find all records with Resources = Example A or Example B.`
+3. ` `
+4. `var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];`
+5. ` `
+6. `// we want to sort these by StartDate, so create an Object for that`
+7. ` `
+8. `var sort = {"StartDate":"ascend"}`
+9. ` `
+7. `//build query from our array, our file and layout name are "Events"`
+8. `var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );`
+
+**Returns:**
+
+```-db=Events&-lay=Events&-query=(q1);(q3)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=Resources&-sortorder.1=ascend&-findquery```
+
+...which can now be passed to **postQueryFMS**.
+
+To specify a request as an **Omit** request, simply specify an -omit property in the object as 1, e.g.
+
+`var requests = [{"Resources":"Example A","-omit":"1"}];`
+
+Will generate a query for omiting all the records where the Resource is equal to Example A.
+
+
+###editRecordURL ( fileName, layoutName, editObj )
+
+* **fileName:** string: The target FileMaker file
+* **layoutName:** string: The target FileMaker layout in the above refernced file
+* **editObj:** object: An object where the properties represent the fields to be edited.
+
+This function will create a -edit query for a FileMaker record if the -recid property is specified.  This represents the FileMaker Record ID of the record to edit.  Optionally a -modid property can be specified.  See the FileMaker <a href="https://fmhelp.filemaker.com/docs/13/en/fms13_cwp_xml.pdf" target="_blank"> CWP XML guide</a> for more info in using the -modid.
+
+If the -recid property is not specified, then this function will create a -new query for generating a new record. 
+
+**-edit Example**
+
+1. `//Edit the Resource value of the record with a -recid of 6198.`
+2. `//Edit the value to Example A`
+3. ` `
+4. `var edit = {"-recid":"6198","Resources":"Example A"};`
+5. ` `
+6. `//build query from our object, our file and layout name are "Events"`
+7. `var query = fmxj.editRecordURL ( "Events" , "Events" , edit );`
+
+**Returns:**
+
+```-db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit```
+
+**-new Example**
+
+
+1. `//Create a new record with Resources set to Example A and StartDate = to 1/11/2015`
+3. ` `
+4. `var newRecord = {"Resources":"Example A","StartDate":"1/11/2015"};`
+5. ` `
+6. `//build query from our object, our file and layout name are "Events"`
+7. `var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );`
+
+**Returns:**
+
+```-db=Events&-lay=Events&Resources=Example A&StartDate=1/11/2015&-new```
+
+...these queries can now be passed to **postQueryFMS**.
+
+###deleteRecordURL ( fileName, layoutName, recid )
+
+* **fileName:** string: The target FileMaker file
+* **layoutName:** string: The target FileMaker layout in the above refernced file
+* **recid:** number: The -recid / Record ID of the record to delete
+
+This function will create a -delete query for a FileMaker record with the specified -recid property.
+
+1. `//Delete the record with a -recid of 6198.`
+2. `//build query from our recid, our file and layout name are "Events"`
+3. ``
+4. `var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
+
+**Returns:**
+
+```-db=Events&-lay=Events&-recid=6198&-delete```
+
+...which can now be passed to **postQueryFMS**.
+
+##Functions for working with JavaScript Objects
+
+***Coming Soon!***
 
 
 
