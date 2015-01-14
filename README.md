@@ -13,7 +13,7 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
 ##Functions for working with FileMaker Server
-The **postQueryFMS** is the primary function used for POSTing query to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
+The **postQueryFMS** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
 **postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
@@ -24,7 +24,7 @@ The **postQueryFMS** is the primary function used for POSTing query to FileMaker
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
-**Example of formatted results (stringified JSON) returned by the postQueryFMS function:**
+**Example of formatted results (stringified JSON) returned by the postQueryFMS function for a find query:**
 
 ```json
 [
@@ -115,7 +115,7 @@ An optional handler function can be passed as well to report the download progre
 
 You can use fmxj without any PHP providing all the JavaScript is hosted on the FileMaker Server.  In this case, the JavaScript will do the httpXMLRequest POST directly to FileMaker Server's XML API.  If the Guest account is not enabled then you will be prompted for FileMaker authentication from the browser.  This is simple **Basic Authentication**, so may not be suitable for your deployment.  If you're using this deployment, you can simply not pass the optional **phpRelay** argument or pass **null** to it.
 
-You will need to use the php Relay if your web server and Filemaker server are located remotely.  FileMaker server does not allow cross domain httpXMLRequests directly to the XML API, and there's no easy way to configure this.  You can do your POST to a PHP page because it's possible to hardcode the PHP headers to allow this kind of cross domain activity.  fmxj comes with a simple PHP file that you can use for this.  You'll then do your POST to the PHP file which will then do the identical POST locally to the FileMaker server and return then relay the XML back.  When doing this you'll need to have the fmxjRelay.php file in your FileMaker WPE's root directory.  You'll then need to define an object in JavaScript and pass it as the phpRelay argument.
+You will need to use the php Relay if your web server and Filemaker server are located remotely.  FileMaker server does not allow cross domain httpXMLRequests directly to the XML API, and there's no easy way to configure this.  You can, however, do your POST to a PHP page because it's possible to hardcode the PHP headers to allow this kind of cross domain activity.  fmxj comes with a simple PHP file that you can use for this.  You'll then do your POST to the PHP file which will then do the identical POST locally to the FileMaker server and then relay the XML back. When doing this you'll need to have the fmxjRelay.php file in your FileMaker WPE's root directory. You'll then need to define an object in JavaScript and pass it as the phpRelay argument.
 
 **Supported Object Properties Are:**
 
@@ -126,7 +126,7 @@ You will need to use the php Relay if your web server and Filemaker server are l
 * user: FileMaker Account Name
 * pass: FileMaker Account Password
 
-User name and password can be passed as part of the object.  They are sent via POST, so can be potentially be secured if both the web server and Filemaker Server have SSL certs, otherwise passing the credentials like this is equivalent to **Basic Authentication**.  You also have the option of hardcoding the FileMaker credentials in the PHP file so they're not passed via JavaScript at all.  Providing your users are logging into the Web Server in a secure way, this might be an acceptable approach.
+User name and password can be passed as part of the object.  They are sent via POST, so can potentially be secured if both the web server and Filemaker Server are using SSL, otherwise passing the credentials like this is equivalent to **Basic Authentication**.  You also have the option of hardcoding the FileMaker credentials in the PHP file so they're not passed via JavaScript at all.
 
 **Examples**
 
@@ -175,7 +175,7 @@ These three functions are used to build the specific query type strings for the 
 var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];
 
 // we want to sort these by StartDate descending and Resource ascending, so create an Object to define that. 
-var sort = {"field1":"DateStart","sort1":"ascend","field2":"Resource","sort2":"descend"};
+var sort = {"field1":"DateStart","sort1":"descend","field2":"Resource","sort2":"ascend"};
 
 //build query from our array, our file and layout name are "Events"
 var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
@@ -183,7 +183,7 @@ var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
 
 **Returns:**
 
--db=Events&-lay=Events&-query=(q1);(q3)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=Resources&-sortorder.1=ascend&-findquery
+-db=Events&-lay=Events&-query=(q1);(q2)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=DateStart&-sortorder.1=descend&-sortfield.2=Resource&-sortorder.2=ascend&-findquery
 
 ...which can now be passed to **postQueryFMS**.
 
@@ -193,7 +193,10 @@ To specify a request as an **Omit** request, simply specify an -omit property in
 var requests = [{"Resources":"Example A","-omit":"1"}];
 ```
 
-Will generate a query for omiting all the records where the Resource is equal to Example A.
+Will generate a query for omiting all the records where the Resource is equal to Example A:
+
+-db=Events&-lay=Events&-query=!(q1)&-q1=Resources&-q1.value=Example A&-findquery
+
 
 ***
 **editRecordURL ( fileName, layoutName, editObj )**
