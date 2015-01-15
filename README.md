@@ -264,7 +264,7 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ...which can now be passed to *postQueryFMS()*.
 
 ###Functions for working with JavaScript Objects
-Additional functions for handling your objects in JavaScript
+Additional functions for handling your objects in JavaScript.
 ***
 
 ***Coming Soon!***
