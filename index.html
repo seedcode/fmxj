@@ -3,22 +3,25 @@
 <html>
 	
 <head>
-	
+
+
+<script src="libraries/prism.js" type="text/javascript"></script> 
 <script src="fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="libraries/prism.css">
 <link rel="stylesheet" type="text/css" href="css/fmxj.css">
 
 </head>
 
 <body>
 	
-	<br/>
-	<div style="height:112px">
+<br/>
+<div style="height:112px">
 		<a href="http://SeedCode.com" style="cursor:pointer">
 		<img src="logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;float:right">
 		</a>
 	</div>
 	
-	<div class="title text-shadow">
+<div class="title text-shadow">
 		<span>fmxj.js</span>
 		<span>
 			<button id="ghub" class="shadow gh">
@@ -26,21 +29,20 @@
 			 </button>
 		</span>
 	</div>
-	<div class="chapter">A JavaScript approach to FileMaker Custom Web Publishing.</div>
-	<div class="subchapter bottomMargin">With fmxj.js and simple JavaScript Objects/JSON, you can...
-		<ul>
+<div class="chapter">A JavaScript approach to FileMaker Custom Web Publishing.</div>
+<div class="subchapter bottomMargin">With fmxj.js and simple JavaScript Objects/JSON, you can...
+	<ul>
 			<li>Build complex queries and POST them to FileMaker Server.</li>
 			<li>Return FileMaker parent and child records as JSON.</li>
 			<li>Create, edit and delete FileMaker records.</li>
 			<li>Filter and sort arrays of JavaScript objects locally with complex criteria.</li>
 		</ul>
-
-	</div>
+</div>
 	
-	<div class="separator"></div>
-	<div class="function">findRecordsURL (fileName, layoutName, requests[, sort, max, skip])</div>
-	<div class="small">Create a complex xml -findquery from an array of javascript objects. These queries are then passed to the postQueryFMS function which returns the results as an array of JavaScript Objects (JSON).</div>
-	<div class="pad shadow">
+<div class="separator"></div>
+<div class="function">findRecordsURL (fileName, layoutName, requests[, sort, max, skip])</div>
+<div class="small">Create a complex xml -findquery from an array of javascript objects. These queries are then passed to the postQueryFMS function which returns the results as an array of JavaScript Objects (JSON).</div>
+<div class="pad shadow">
 		<div class="line">
 			<span class="label">fileName:</span>
 			<span class="desc">String: Name of the hosted FileMaker file.</span>
@@ -67,70 +69,99 @@
 		</div>
 	
 	</div>
-	<div class="small">example 1.1: Two request find.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="requests" class="code small indent"></pre>
-		</div>
-		<div class="line">
-			<pre class="code small">2. fmxj.findRecordsURL ( "Events" , "Events" , requests );</pre>
-		</div>
-	</div>
-	<div>
-		<button id="getfindxml" class="shadow">try</button>
-	</div>
-	<div class="pad shadow">
-		<div id="xmlfind" class="result"></div>
-	</div>
+<div class="small">example 1.1: Two request find.</div>
+	
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+var requests =	[
+					{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+					{ "DateStart" : "2/1/2014...2/28/2014" }
+			   	];	
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests );</code>
+</pre>
+</div>
+<div>
+	<button id="getfindxml" class="shadow">try</button>
+</div>
+<div class="pad shadow">
+	<div id="xmlfind" class="result"></div>
+</div>
+	
 	<div class="small">example 1.2: Add additional criteria to requests object, so both requests have the Resource field equal to "Example C".</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="requests" class="code small">3. requests[0]["Resource"] = "Example C";</pre>
-			<pre id="requests" class="code small">4. requests[1]["Resource"] = "Example C";</pre>
-		</div>
-	</div>
-	<div>
-		<button id="addfindxml" class="shadow">try</button>
-	</div>
-	<div class="pad shadow">
+	
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+var requests =	[
+					{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" },
+					{ "DateStart" : "2/1/2014...2/28/2014" }
+			   	];
+requests[0]["Resource"] = "Example C";
+requests[1]["Resource"] = "Example C";
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests );</code>
+</pre>
+</div>
+	
+<div>
+	<button id="addfindxml" class="shadow">try</button>
+</div>
+<div class="pad shadow">
 		<div id="xmladdfind" class="result"></div>
 	</div>
-	<div class="small">example 1.3: Specify a sort order for the request by passing an object to the optional sort argument.  Supprted order values are: ascend, descend and valuelist.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="sort" class="code small indent"></pre>
-		</div>
-		<div class="line">
-			<pre class="code small">2. fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );</pre>
-		</div>
-	</div>
-	<div>
+	
+<div class="small">example 1.3: Specify a sort order for the request by passing an object to the optional sort argument.  Supprted order values are: ascend, descend and valuelist.</div>
+
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+var requests =	[
+					{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+					{ "DateStart" : "2/1/2014...2/28/2014" }
+				] ;
+var sort =	{ 
+			"field1" : "DateStart" ,
+			"sort1" : "descend" ,
+			"field2" : "id" ,
+			"order2" : "ascend"
+			} ;
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort ) ;</code>
+</pre>
+</div>
+
+<div>
 		<button id="sortbtn" class="shadow">try</button>
 	</div>
-	<div class="pad shadow">
+<div class="pad shadow">
 		<div id="xmlsort" class="result"></div>
 	</div>
 	
-	<div class="small">example 1.4: Specify an Omit Request by setting the -omit property to 1.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="requestsOmit" class="code small indent"></pre>
-		</div>
-		<div class="line">
-			<pre class="code small">2. fmxj.findRecordsURL ( "Events" , "Events" , requests );</pre>
-		</div>
-	</div>
-	<div>
-		<button id="omitfindxml" class="shadow">try</button>
-	</div>
-	<div class="pad shadow">
+	
+<div class="small">example 1.4: Specify an Omit Request by setting the -omit property to 1.</div>
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+var requests =	[
+					{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+					{ "DateStart" : "2/1/2014...2/28/2014" } ,
+					{ "Resources" : "Example B" , "-omit" : "1" }
+				] ;
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests ) ;</code>
+</pre>
+
+</div>
+
+<div>
+	<button id="omitfindxml" class="shadow">try</button>
+</div>
+<div class="pad shadow">
 		<div id="xmlomitfind" class="result"></div>
 	</div>
 	
-	<div class="separator"></div>
-	<div class="function">postQueryFMS (query, callBackOnReady[, callBackOnDownload, phpRelay])</div>
-	<div class="small">POSTS a query to FileMaker Server and returns the results as JavaScript Objects (JSON) for Callback.</div>
-	<div class="pad shadow">
+<div class="separator"></div>
+<div class="function">postQueryFMS (query, callBackOnReady[, callBackOnDownload, phpRelay])</div>
+<div class="small">POSTS a query to FileMaker Server and returns the results as JavaScript Objects (JSON) for Callback.</div>
+<div class="pad shadow">
 		<div class="line">
 			<span class="label">query:</span>
 			<span class="desc">String: The query built by one of the URL functions.</span>
@@ -149,44 +180,52 @@
 		</div>
 	</div>
 	
-	<div class="small">example 2.1: Create query and POST to FileMaker server, then return results as JavaScript objects.  Stringified results are written to the div via call back function.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre class="code small">1. var url = fmxj.findRecordsURL ( "Events" , "Events" , requests );</pre>
-			<pre class="code small">2. fmxj.postQueryFMS ( url , onReadyFunction , onProgressFunction  );</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 2.1: Create query and POST to FileMaker server, then return results as JavaScript objects.  Stringified results are written to the div via call back function.</div>
+<div class="pad shadow">
+	
+<pre class="line-numbers">
+<code class="language-javascript">
+var query = fmxj.findRecordsURL ( "Events" , "Events" , requests ) ;
+fmxj.postQueryFMS ( query , onReadyFunction , onProgressFunction ) ;</code>
+</pre>
+	
+</div>
+<div>
 		<button id="btnjson" class="shadow">try</button>
 		<span>&nbsp</span>
 		<span id="count">Uses the currently selected xml query from above so you can try them all. </span>
 	</div>
-	<div class="pad shadow">
+<div class="pad shadow">
 		<pre id="findResult" class="result tall"></pre>
 	</div>
 	
-	<div class="small">example 2.2: Errors returned as a simple one object array with the Filemaker error code:</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre class="code small">1. var url = fmxj.findRecordsURL ( "Events" , "ShmEvents" , requests );</pre>
-			<pre class="code small">2. fmxj.postQueryFMS ( url , callBackFunction );</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 2.2: Errors returned as a simple one object array with the Filemaker error code:</div>
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+var query = fmxj.findRecordsURL ( "Events" , "ShmEvents" , requests ) ;
+fmxj.postQueryFMS ( query , onReadyFunction ) ;</code>
+</div>
+<div>
 		<button id="errorbtn" class="shadow">try</button>
 	</div>
-	<div class="pad shadow">
+<div class="pad shadow">
 		<div id="error" class="result"></div>
 	</div>
 	
-	<div class="small">example 2.3: Portals on the target layout will be returned as nested arrays.  Properties that represent related records will have the Table Occurerence name followed by "::".</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre class="code small">1. var requests = [{"Status":"Customer"}];</pre>
-			<pre class="code small">2. var url = fmxj.findRecordsURL ( "Contacts" , "Contacts" , requests );</pre>
-			<pre class="code small">3. fmxj.postQueryFMS ( url , onReadyFunction , onProgressFunction  );</pre>
-		</div>
-	</div>
+<div class="small">example 2.3: Portals on the target layout will be returned as nested arrays.  Properties that represent related records will have the Table Occurerence name followed by "::".</div>
+<div class="pad shadow">
+	
+<pre class="line-numbers">
+<code class="language-javascript">
+var requests =	[
+					{ "Status" : "Customer" }
+				] ;
+var query = fmxj.findRecordsURL ( "Contacts", "Contacts". requests ) ;
+fmxj.postQueryFMS ( query , onReadyFunction , onProgressFunction ) ;</code>
+</pre>
+
+</div>
 	<div>
 		<button id="btncontact" class="shadow">try</button>
 		<span>&nbsp</span>
@@ -197,17 +236,21 @@
 	</div>
 	
 	<div class="small">example 2.4: Use a PHP relay if your FileMaker Server is hosted remotely from your Web Server by adding the fmxjRelay.php file to your WPE root directory. Then create an object in your JavaScript that defines the server location and pass it to the function. Supported properties for the object: { "php" : the php file , "server" : server location , "protocol" : [optional: default http] , "port" : [optional: default 80] ,"user" : [optional: FM Account] , "pass" : [optional: FM Account Password] } </div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre class="code small">1. var relay = {"php":"fmxjRelay.php","server":"71.229.202.172"};</pre>
-			<pre class="code small">2. fmxj.postQueryFMS ( url , callBackFunction , null , relay );</pre>
-		</div>
-	</div>
+<div class="pad shadow">
+
+<pre class="line-numbers">
+<code class="language-javascript">
+var relay = { "php" : "fmxjRelat.php", "server" : "seedcode.com" } ;
+// not using a call back for onDownload, so pass null for its argument
+fmxj.postQueryFMS ( query , onReadyFunction , null , relay ) ;</code>
+</pre>
+
+</div>
 	
-	<div class="separator"></div>
-	<div class="function">editRecordURL ( fileName , layoutName , editObj )</div>
-	<div class="small">Create a FileMaker -edit or -new query url from a javascript object.</div>
-	<div class="pad shadow">
+<div class="separator"></div>
+<div class="function">editRecordURL ( fileName , layoutName , editObj )</div>
+<div class="small">Create a FileMaker -edit or -new query url from a javascript object.</div>
+<div class="pad shadow">
 		<div class="line">
 			<span class="label">fileName:</span>
 			<span class="desc">String: Name of the hosted FileMaker file.</span>
@@ -223,50 +266,69 @@
 	</div>
 	
 	
-	<div class="small">example 3.1: Read the first object in the array and update the corresponding FileMaker record.  If the Status is Open, set it to Closed, and vice-versa.  If server edit is succesful, then the full object/record will be returned and the array displayed above in example 2.1 will be updated. </div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre class="code small">1. firstRecord = source[0];</pre>
-			<pre class="code small">2. var recid = firstRecord["-recid"];</pre>
-			<pre class="code small">3. var recordStatus = firstRecord["Status"];</pre>
-			<pre class="code small">4. var recordModId = firstRecord["-modid"] ;</pre>
-			<pre class="code small">5. //create an edit object and array for this record with the new status</pre>
-			<pre class="code small">6. var edit = {"-recid";recid};</pre>
-			<pre class="code small">7. var requests = [edit];</pre>
-			<pre class="code small">8. if ( recordStatus == "Open" ) {var newStatus = "Closed" } <br/>   else {var newStatus = "Open" } ;</pre>
-			<pre class="code small">9. edit["Status"] = newStatus ;</pre>
-			<pre class="code small">10. edit["-modid"] = recordModId ;</pre>
-			<pre class="code small">11. // edit is now { "-recid" : recid , "-modid" : "recordModId" , "Status" : newStatus }</pre>
-			<pre class="code small">12. fmxj.postQueryFMS ( edit , callBackFunction )</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 3.1: Read the first object in the array and update the corresponding FileMaker record.  If the Status is Open, set it to Closed, and vice-versa.  If server edit is succesful, then the full object/record will be returned and the array displayed above in example 2.1 will be updated. </div>
+	
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+// capture first object in the array so we can get the current values
+var firstRecord = source[0] ;
+var recid = firstRecord["-recid"] ;
+var modid = firstRecord["-modid"] ;
+var recordStatus = firstRecord["Status"] ;
+// create an edit object for this record
+var edit = { "-recid" : recid , "-modid" : modid } ;
+// toggle the value for Status
+if ( recordStatus==="Open" ) {
+	var newStatus = "Closed" ;
+	}
+else {
+	var newStatus = "Open" ;
+	} ;
+// update edit object with new status balue
+edit["Status"] = newStatus ;
+//POST query to edit object
+fmxj.postQueryFMS ( edit , callBackFunction ) ;</code>
+</pre>
+		
+
+</div>
+	
+<div>
 		<button id="editbtn" class="shadow">try</button>
 		<span>&nbsp</span>
 		<span>uses the data in example 2.1, so make sure that's populated first!</span>
 	</div>
-	<div class="pad shadow tall">
+<div class="pad shadow tall">
 		<pre id="edit" class="result"></pre>
 	</div>
-	<div class="small">example 3.2: Create a new FileMaker record by not specifying the -recid in the edit object.  If the record creation is succesful on the server, the full object/record will be returned and added to the bottom of the array displayed above in example 2.1.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="new" class="code small indent"></pre>
-			<pre class="code small">2. var url = fmxj.editRecordURL ( "Events" , "Events" , newRecord )</pre>
-			<pre class="code small">3. fmxj.postQueryFMS ( url , callBackFunction )</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 3.2: Create a new FileMaker record by not specifying the -recid in the edit object.  If the record creation is succesful on the server, the full object/record will be returned and added to the bottom of the array displayed above in example 2.1.</div>
+<div class="pad shadow">
+	
+<pre class="line-numbers">
+<code class="language-javascript">
+var newRecord =	{
+					"DateStart" : "02/25/2014" ,
+					"DateEnd" : "02/25/2014" ,
+					"Description" : "test" ,
+					"Status" : "Open" ,
+					"Summary" : "test summary ubi"
+				} ;
+var query = fmxj.editRecordURL ( "Events", "Events", newRecord ) ;
+fmxj.postQueryFMS ( query , callBackFunction ) ;</code>
+</pre>
+</div>
+<div>
 		<button id="newbtn" class="shadow">try</button>
 	</div>
-	<div class="pad shadow tall">
+<div class="pad shadow tall">
 		<pre id="newrecord" class="result"></pre>
 	</div>
 	
-	<div class="separator"></div>
-	<div class="function">deleteRecordURL ( fileName , layoutName , recid )</div>
-	<div class="small">Create a FileMaker -delete query url from record id.</div>
-	<div class="pad shadow">		
+<div class="separator"></div>
+<div class="function">deleteRecordURL ( fileName , layoutName , recid )</div>
+<div class="small">Create a FileMaker -delete query url from record id.</div>
+<div class="pad shadow">		
 		<div class="line">
 			<span class="label">fileName:</span>
 			<span class="desc">String: Name of the hosted FileMaker file.</span>
@@ -280,28 +342,33 @@
 			<span class="desc">Number: The FileMaker record id. Can be accessed from an object's -recid property.</span>
 		</div>
 	</div>
-	<div class="small">example 4.1: Delete a FileMaker record based on the last object of the current array.  If succesfully deleted on the server, the object will be removed from the current array.  Error codes are always returned for the delete queries, with "0" meaning a succesful delete.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre class="code small">1. //get the -recid of the last object in the array.</pre>
-			<pre class="code small">1. var recid = source[source.length-1][-recid];</pre>
-			<pre class="code small">2. var url = fmxj.deleteRecordURL ( "Events" , "Events" , recid )</pre>
-			<pre class="code small">3. fmxj.postQueryFMS ( url , callBackFunction )</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 4.1: Delete a FileMaker record based on the last object of the current array.  If succesfully deleted on the server, the object will be removed from the current array.  Error codes are always returned for the delete queries, with "0" meaning a succesful delete.</div>
+	
+<div class="pad shadow">
+	
+<pre class="line-numbers">
+<code class="language-javascript">
+// get the -recid of the last object in the array
+var recid = source[source.length-1]["-recid"] ;
+var query = fmxj.deleteRecordURL ( "Events", "Events", recid ) ;
+fmxj.postQueryFMS ( query , callBackFunction ) ;</code>
+</pre>
+
+</div>
+
+<div>
 		<button id="deletebtn" class="shadow">try</button>
 		<span>&nbsp</span>
 		<span>deletes the last object in example 2.1 so make sure that's populated.</span>
 	</div>
-	<div class="pad shadow">
+<div class="pad shadow">
 		<pre id="deleterecord" class="result"></pre>
 	</div>
 	
-	<div class="separator"></div>
-	<div class="function">filterObjects ( filters , searchTypes , source )</div>
-	<div class="small">Apply complex property filters to an array of objects using the request syntax.</div>
-	<div class="pad shadow">
+<div class="separator"></div>
+<div class="function">filterObjects ( filters , searchTypes , source )</div>
+<div class="small">Apply complex property filters to an array of objects using the request syntax.</div>
+<div class="pad shadow">
 		<div class="line">
 			<span class="label">filters:</span>
 			<span class="desc">Array of Objects: Each object represents a "FileMaker Type" request.</span>
@@ -315,29 +382,38 @@
 			<span class="desc">Array of Objects: Objects to be filtered.</span>
 		</div>
 	</div>
-	<div class="small">example 5.1:  Filter the current array of objects based on a filter object made of FileMaker type find requests.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="filter" class="code small indent"></pre>
-			<pre class="code small">2. var types = {"id":"equals"};</pre>
-			<pre class="code small">3. fmxj.filterObjects ( filterObj , types , source )</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 5.1:  Filter the current array of objects based on a filter object made of FileMaker type find requests.</div>
+	
+<div class="pad shadow">
+	
+<pre class="line-numbers">
+<code class="language-javascript">
+var requests = [
+					{ "id" : "E4B04F12-E006-4928-A1E0-0E86EDF5641C" } ,
+					{ "id" : "463BBEA9-404B-4979-8CC0-6F8F60EB0154" } ,
+					{ "id" : "8CDA64C4-643D-4A64-9336-83BEF07F0CF4" } ,
+			   ] ;
+var types = { "id" : "equals" , "Status" : "equals" } ;
+fmxj.filterObjects ( requests , types , source ) ;</code>
+</pre>
+
+</div>
+	
+<div>
 		<button id="filterbtn" class="shadow">filter</button>
 		<span>&nbsp</span>
 		<button id="revertfilterbtn" class="shadow">revert</button>
 		<span>&nbsp</span>
 		<span id="filterCount"></span>
 	</div>
-	<div class="pad shadow">
+<div class="pad shadow">
 		<pre id="filterResult" class="result tall"></pre>
 	</div>
 	
-	<div class="separator"></div>
-	<div class="function">sortObjects ( sortOrder , dataTypes ,  source )</div>
-	<div class="small">Sort an array of objects by multiple properties.</div>	
-	<div class="pad shadow">
+<div class="separator"></div>
+<div class="function">sortObjects ( sortOrder , dataTypes ,  source )</div>
+<div class="small">Sort an array of objects by multiple properties.</div>	
+<div class="pad shadow">
 		<div class="line">
 			<span class="label">sortOrder:</span>
 			<span class="desc">Object: Specifies sort properties and sort order.</span>
@@ -351,26 +427,36 @@
 			<span class="desc">Array of Objects: Objects to be sorted.</span>
 		</div>
 	</div>
-	<div class="small">example 6.1: Filter an array of objects by 1-n properties.  Specify an object of properties and their sort orders.  Also specify an object defining the data type to use to sort the specified properties.  Supported data types are: String, Number, Date/Timestamp and Time.  Unspecified properties are sorted as Strings.</div>
-	<div class="pad shadow">
-		<div class="line">
-			<pre id="sortJs" class="code small indent"></pre>
-			<pre id="sortTypes" class="code small indent"></pre>
-			<pre class="code small">3. fmxj.sortObjects ( sort , dataTypes , source )</pre>
-		</div>
-	</div>
-	<div>
+<div class="small">example 6.1: Filter an array of objects by 1-n properties.  Specify an object of properties and their sort orders.  Also specify an object defining the data type to use to sort the specified properties.  Supported data types are: String, Number, Date/Timestamp and Time.  Unspecified properties are sorted as Strings.</div>
+	
+<div class="pad shadow">
+<pre class="line-numbers">
+<code class="language-javascript">
+var sort = 	{ 
+				"field1" : "Resource" ,
+				"sort1" : "ascend" ,
+				"field2" : "DateStart" ,
+				"order2" : "descend"
+		 	} ;
+var dataTypes = {
+					"Resource" : "String" ,
+					"DateStart" : "Date"
+				} ;
+fmxj.sortObjects ( sort, dataTypes, source ) ;</code>
+</pre>	
+</div>
+		
+<div>
 		<button id="sortJsbtn" class="shadow">sort</button>
 		<span>&nbsp</span>
 		<button id="revertSortJsbtn" class="shadow">revert</button>
 		<span>&nbsp</span>
 		<span id="sortJsCount"></span>
 	</div>
-	<div class="pad shadow">
+<div class="pad shadow">
 		<pre id="sortJsResult" class="result tall"></pre>
 	</div>
-	
-	<div class="separator"></div>
+<div class="separator"></div>
 
 	
 </body>
@@ -434,18 +520,11 @@
 		     	"Status": "Open",
 		     	"Summary": "test summary ubi"
 		    };
-	
-	//global sort Object display value
-	var sortObject =
-		 	{
-			 "field1": "DateStart","order1": "descend",
-			 "field2": "id", "order2": "ascend" 
-	   	 	};
 			
 	//global filter Object display value
 	var filterObj =
 		 	[
-				{"id":"E4B04F12-E006-4928-A1E0-0E86EDF5641C","Status":"Open"},
+				{"id":"E4B04F12-E006-4928-A1E0-0E86EDF5641C"},
 				{"id":"463BBEA9-404B-4979-8CC0-6F8F60EB0154"},
 				{"id":"8CDA64C4-643D-4A64-9336-83BEF07F0CF4"}
 			];
@@ -466,39 +545,10 @@
 	   	 	};
 			
 	//end sample data
-			
-	//set requests into code pres as stringified json
-	var queryJson = JSON.stringify ( requests , null , " " );
-	document.getElementById("requests").innerHTML =  "1. var requests = " + queryJson + ";";
-	
-	var queryJsonOmit = JSON.stringify ( requestsOmit , null , " " );
-	document.getElementById("requestsOmit").innerHTML =  "1. var requests = " + queryJsonOmit + ";";
-	
-	var queryJsonSort = JSON.stringify ( sortObject , null , " " );
-	document.getElementById("sort").innerHTML =  "1. var sort = " + queryJsonSort + ";";
-	
-	var queryJsonNew = JSON.stringify ( newRecord , null , " " );
-	document.getElementById("new").innerHTML =  "1. var newRecord = " + queryJsonNew + ";";
-	
-	var queryJsonfilter = JSON.stringify ( filterObj , null , " " );
-	document.getElementById("filter").innerHTML =  "1. var filterObj = " + queryJsonfilter + ";";
-	
-	var queryJsonSortJs = JSON.stringify ( sortObjectJs , null , " " );
-	document.getElementById("sortJs").innerHTML =  "1. var sort = " + queryJsonSortJs + ";";
-	
-	var queryJsonSortTypes = JSON.stringify ( sortTypes , null , " " );
-	document.getElementById("sortTypes").innerHTML =  "2. var dataTypes = " + queryJsonSortTypes + ";";
-	
-	//now clear, we reset if/when sort button clicked.
-	sortObject = null;
-	
-	//set relay to null if hosting everything on your FMS and using XML directly
-	//var relay = null;
 	
 	//define PHP relay info if using
-	//Test server with Events and Contacts on Foxtail Tech server.
-	var relay = {"php":"fmxjRelay.php","server":"sc-fms13-fms.fmsdb.com","protocol":"https","port":"443"};
-	
+	//var relay = null;
+	var relay = {"php":"fmxjRelay.php"};
 	
 	//buttons
 	var e = "";

@@ -87,26 +87,6 @@ An optional handler function can be passed as well to report the download progre
         "z_MilestoneSort": "",
         "z_Notified": "",
         "z_Repeating_id": ""
-    },
-    {
-        "-recid": "6202",
-        "-modid": "4",
-        "DateEnd": "02/13/2014",
-        "DateStart": "02/13/2014",
-        "Description": "",
-        "id": "729C0926-6CBB-46AF-913D-67AE489056FA",
-        "id_contact": "E7CA4DFA-2AFA-4756-80E0-C0E157A6E876",
-        "id_Phase": "",
-        "id_Project": "P00031",
-        "Resource": "Example E",
-        "Status": "Open",
-        "Summary": "Begin Production",
-        "TimeEnd": "",
-        "TimeStart": "",
-        "z_LinkedWithinProject": "1",
-        "z_MilestoneSort": "",
-        "z_Notified": "",
-        "z_Repeating_id": ""
     }
 ]
 ```
@@ -128,7 +108,7 @@ You will need to use the php Relay if your web server and Filemaker server are l
 
 User name and password can be passed as part of the object.  They are sent via POST, so can potentially be secured if both the web server and Filemaker Server are using SSL, otherwise passing the credentials like this is equivalent to **Basic Authentication**.  You also have the option of hardcoding the FileMaker credentials in the PHP file so they're not passed via JavaScript at all.
 
-**Examples**
+**Relay Examples**
 
 ```javascript
 //create two objects in a JSON array, each one is a FileMaker Find Request
@@ -220,7 +200,7 @@ var edit = {"-recid":"6198","Resources":"Example A"};
 var query = fmxj.editRecordURL ( "Events" , "Events" , edit );
 ```
 
-**...returns:
+**...returns:**
 
 -db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit**
 

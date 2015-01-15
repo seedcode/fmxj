@@ -1,12 +1,13 @@
 * {
 	font-family:Cabin,Arial,Verdana,sans-serif;
-	background-color: rgb(88,93,118);
+
 
 }
 
 body {
 	min-width:800px;
 	width:85%;
+	background-color: rgb(88,93,118);
 }
  
 footer {
@@ -14,16 +15,19 @@ footer {
 }
 
 div {
+	padding:6px;
+	margin:5px;
 	display:block;
 	color:white;
-	margin:5px;
 	margin-left:17%;
-	padding:6px;
 	word-wrap: break-word;   
 }
 
 pre {
-	word-wrap: break-word; 
+	
+	padding-top:16px;
+	margin:0px;
+
 }
 
 span {
@@ -51,6 +55,15 @@ button:hover{
 
 li {
 	font-size:20px;
+}
+
+ol {
+
+}
+
+code {
+	font-size:13px;
+
 }
 
 .gh {
@@ -92,10 +105,11 @@ li {
 	margin-top:0px;
 	margin-bottom:0px;
 	color:rgb(88,93,118);
-	background: #eee;
+	background: #f5f2f0;
 }
+
 .line {
-	background:#eee;
+	background:#f5f2f0;
 	padding:0px;
 	margin-left:4px;
 	
@@ -132,7 +146,7 @@ li {
 .label {
 	vertical-align:top;
 	color:rgb(88,93,118);
-	background: #eee;
+	background: #f5f2f0;
 	font-size:14px;
 	font-weight:bold;
 
@@ -147,7 +161,7 @@ li {
 .desc {
 	vertical-align:top;
 	color:rgb(88,93,118);
-	background: #eee;
+	background: #f5f2f0;
 	font-size:14px;
 	margin-left:1px;
 	display:inline-block;
@@ -158,7 +172,6 @@ li {
 .result {
 	color:rgb(88,93,118);
 	margin-left:0px;
-	background: #eee;
 	font-size:small;
 	min-height:48px;
 	max-height:200px;
