@@ -181,7 +181,7 @@ var sort = {"field1":"DateStart","sort1":"descend","field2":"Resource","sort2":"
 var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
 ```
 
-...returns:
+**...returns:**
 
 -db=Events&-lay=Events&-query=(q1);(q2)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=DateStart&-sortorder.1=descend&-sortfield.2=Resource&-sortorder.2=ascend&-findquery
 
@@ -193,7 +193,7 @@ To specify a request as an **Omit** request, simply specify an -omit property in
 var requests = [{"Resources":"Example A","-omit":"1"}];
 ```
 
-...returns a query string for omiting all the records where the Resource is equal to Example A:
+**...returns a query string for omiting all the records where the Resource is equal to Example A:**
 
 -db=Events&-lay=Events&-query=!(q1)&-q1=Resources&-q1.value=Example A&-findquery
 
@@ -220,9 +220,9 @@ var edit = {"-recid":"6198","Resources":"Example A"};
 var query = fmxj.editRecordURL ( "Events" , "Events" , edit );
 ```
 
-...returns:
+**...returns:
 
--db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit
+-db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit**
 
 **-new Example**
 
@@ -234,7 +234,7 @@ var newRecord = {"Resources":"Example A","StartDate":"1/11/2015"};
 var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );    
 ```
 
-...returns:
+**...returns:**
 
 -db=Events&-lay=Events&Resources=Example A&StartDate=1/11/2015&-new
 
@@ -257,7 +257,7 @@ This function will create a -delete query for a FileMaker record with the specif
 var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ```
 
-...returns:
+**...returns:**
 
 -db=Events&-lay=Events&-recid=6198&-delete
 
