@@ -255,7 +255,7 @@ Additional functions for handling your objects in JavaScript.
   * equals
 * **source:** array of objects: objects to be filtered
 
-This function creates a new array of objects from a source array based on filters. Each **filters** object represents a FileMaker type find request where each set of name value pairs within the object are *AND* clauses and each object represents an *OR* clause. **searchTypes** alloes you to choose from one of the pre-configured regex searches set up in the function.  You can add your own types by adding them to the **generatRegEx()** function that lives inside **filteObjects**
+This function creates a new array of objects from a source array based on filters. Each **filters** object represents a FileMaker type find request where each set of name value pairs within the object are *AND* clauses and each object represents an *OR* clause. **searchTypes** alloes you to choose from one of the pre-configured regex searches set up in the function.  You can add your own types by adding them to the **generatRegEx()** function that lives inside **filteObjects.**
 
 ``` javascript
 //regExp logic is here: for string, use "begins with" by default.
@@ -273,6 +273,50 @@ var generateRegEx = function ( v , dt ) {
 return re;
 };
 ```
+**Example**
+
+``` javascript
+var requests = [
+					{ "id" : "E4B04F12-E006-4928-A1E0-0E86EDF5641C" } ,
+					{ "id" : "463BBEA9-404B-4979-8CC0-6F8F60EB0154" } ,
+					{ "id" : "8CDA64C4-643D-4A64-9336-83BEF07F0CF4" } ,
+			   ] ;
+var types = { "id" : "equals" , "Status" : "equals" } ;
+fmxj.filterObjects ( requests , types , source ) ;
+```
+
+***
+**sortObjects ( filters , searchTypes , source )**
+
+* **sortOrder:** object: specifies the properties to sort and their sort order.
+* **dataTypes:** object: specifies the data type for the property. Supported data types are:
+  * String (default, if not specified)
+  * Number
+  * Date (use for timestamps too)
+  * time (of day)
+* **source:** array of objects: objects to be sorted
+
+This function sorts the specified array of objects by 1-n properties, specifying the data type for the property.
+
+**Example**
+
+``` javascript
+var sort = 	{ 
+				"field1" : "Resource" ,
+				"sort1" : "ascend" ,
+				"field2" : "DateStart" ,
+				"order2" : "descend"
+		 	} ;
+var dataTypes = {
+					"Resource" : "String" ,
+					"DateStart" : "Date"
+				} ;
+fmxj.sortObjects ( sort, dataTypes, source ) ;
+```
+
+***
+
+
 
 
 
