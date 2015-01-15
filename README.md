@@ -246,8 +246,33 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ###Functions for working with JavaScript Objects
 Additional functions for handling your objects in JavaScript.
 ***
+**filterObjects ( filters , searchTypes , source )**
 
-***Coming Soon!***
+* **filters:** array of objects: each object represents a "FileMaker" type requests
+* **searchTypes:** object: specifies the search type to perform on the specified property. Supported types are:
+  * contains
+  * startswith
+  * equals
+* **source:** array of objects: objects to be filtered
+
+This function creates a new array of objects from a source array based on filters. Each **filters** object represents a FileMaker type find request where each set of name value pairs within the object are *AND* clauses and each object represents an *OR* clause. **searchTypes** alloes you to choose from one of the pre-configured regex searches set up in the function.  You can add your own types by adding them to the **generatRegEx()** function that lives inside **filteObjects**
+
+``` javascript
+//regExp logic is here: for string, use "begins with" by default.
+var generateRegEx = function ( v , dt ) {
+	var re = new RegExp();
+	if (dt.toUpperCase() === "STARTSWITH") { 
+		re = new RegExp ( "^" + v + "|\\s" + v , "mi" ) ;
+	}
+	else if (dt.toUpperCase() === "EQUALS") { 
+		re = new RegExp ( "^" + v + "$" ) ;
+	}
+	else if (dt.toUpperCase() === "CONTAINS") { 
+		re = new RegExp ( "\\" + v + "\\" , "mi" ) ;
+	};
+return re;
+};
+```
 
 
 
