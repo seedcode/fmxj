@@ -544,11 +544,21 @@ fmxj.sortObjects ( sort, dataTypes, source ) ;</code>
 		 	"DateStart": "Date" 
 	   	 	};
 			
+		var sortObject =	{ 
+					"field1" : "DateStart" ,
+					"sort1" : "descend" ,
+					"field2" : "id" ,
+					"order2" : "ascend"
+					} ;
+			
 	//end sample data
+	
+	//now clear, we reset if/when sort button clicked.
+	sortObject = null;
 	
 	//define PHP relay info if using
 	//var relay = null;
-	var relay = {"php":"fmxjRelay.php"};
+	var relay = {"php":"fmxjRelay.php","server":"sc-fms13-fms.fmsdb.com","protocol":"https","port":"443"};
 	
 	//buttons
 	var e = "";
