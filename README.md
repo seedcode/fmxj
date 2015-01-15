@@ -13,7 +13,7 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
 ##Functions for working with FileMaker Server
-The **postQueryFMS** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
+The **postQueryFMS()** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
 **postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
@@ -185,9 +185,9 @@ var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
 
 -db=Events&-lay=Events&-query=(q1);(q2)&-q1=Resources&-q1.value=Example A&-q2=Resources&-q2.value=Example B&-sortfield.1=DateStart&-sortorder.1=descend&-sortfield.2=Resource&-sortorder.2=ascend&-findquery
 
-...which can now be passed to **postQueryFMS**.
+...which can now be passed to *postQueryFMS()*.
 
-To specify a request as an **Omit** request, simply specify an -omit property in the object as 1, e.g.
+To specify a request as an *Omit* request, simply specify an -omit property in the object as 1, e.g.
 
 ```javascript
 var requests = [{"Resources":"Example A","-omit":"1"}];
@@ -238,7 +238,7 @@ var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );
 
 -db=Events&-lay=Events&Resources=Example A&StartDate=1/11/2015&-new
 
-...these queries can now be passed to **postQueryFMS**.
+...these queries can now be passed to *postQueryFMS()*.
 
 ***
 **deleteRecordURL ( fileName, layoutName, recid )**
@@ -261,7 +261,7 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 
 -db=Events&-lay=Events&-recid=6198&-delete
 
-...which can now be passed to **postQueryFMS**.
+...which can now be passed to *postQueryFMS()*.
 
 ###Functions for working with JavaScript Objects
 Additional functions for handling your objects in JavaScript
