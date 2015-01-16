@@ -25,6 +25,7 @@ div {
 
 pre {
 	
+	overflow:auto;
 	padding-top:16px;
 	margin:0px;
 
@@ -62,20 +63,10 @@ ol {
 }
 
 code {
-	font-size:13px;
-
+	font-size:small;
 }
 
-.gh {
-	margin-top:12px;
-	float:right;
-	vertical-align:bottom;
-	display:inline-block;
-	padding-right:42px;
-	padding-left:42px;
-	padding-top:9px;
-	padding-bottom:9px;
-}
+
 
 
 .chapter {
@@ -223,4 +214,15 @@ code {
 
 .bottomMargin {
 	margin-bottom:-36px;
+}
+
+.gh {
+	margin-top:12px;
+	float:right;
+	vertical-align:bottom;
+	display:inline-block;
+	padding-right:42px;
+	padding-left:42px;
+	padding-top:9px;
+	padding-bottom:9px;
 }

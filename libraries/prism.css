@@ -9,7 +9,8 @@ code[class*="language-"],
 pre[class*="language-"] {
 	color: black;
 	text-shadow: 0 1px white;
-	font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	//font-family: Consolas, Monaco, 'Andale Mono', monospace;
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
@@ -72,7 +73,8 @@ pre[class*="language-"] {
 }
 
 .token.punctuation {
-	color: #999;
+	//color: #999;
+	color: #000066;
 }
 
 .namespace {
@@ -98,7 +100,7 @@ pre[class*="language-"] {
 }
 
 .token.string {
-	color:#006600;
+	color:#87193E;
 }
 
 .token.operator,
@@ -153,11 +155,12 @@ pre.line-numbers > code {
 	pointer-events: none;
 	top: 0px;
 	font-size: 100%;
-	left: -3.8em;
+	left: -4.4em;
 	width: 3em; /* works for line-numbers below 1000 lines */
 	letter-spacing: -1px;
-	border-right: 2px solid #999;
-	line-height: 1.7;
+	border-right: .1em solid #999;
+	background: #E9E9EE;
+
 
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -170,13 +173,17 @@ pre.line-numbers > code {
 		pointer-events: none;
 		display: block;
 		counter-increment: linenumber;
+		line-height: 1.6;
+		margin-bottom:4%;
+		padding-top:1%;
+
 	}
 
 		.line-numbers-rows > span:before {
 			content: counter(linenumber);
 			color: #999;
 			display: block;
-			padding-right: 0.8em;
+			padding-right: 1.1em;
 			text-align: right;
 
 
