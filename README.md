@@ -90,7 +90,87 @@ An optional handler function can be passed as well to report the download progre
     }
 ]
 ```
+**Example of formatted results (stringified JSON) returned by the postQueryFMS function for a find query with a Portal on the target layout:** *(We recommend using this sparingly as it can put a significantly higher load on the server, and we'll be exploring some client side alternitives to this.)*
 
+```json
+[
+    {
+        "-recid": "295",
+        "-modid": "1",
+        "id": "236685826794508408193649246489835084122",
+        "NameFirst": "Branden",
+        "NameLast": "Shortsleeve",
+        "Status": "Customer",
+        "ContactInfo::": [
+            {
+                "Type": "Email",
+                "Value": "branden@shortsleeve.com"
+            },
+            {
+                "Type": "Phone",
+                "Value": "(616) 459-5130"
+            },
+            {
+                "Type": "URL",
+                "Value": "http://www.brandenshortsleeve.com"
+            }
+        ]
+    },
+    {
+        "-recid": "499",
+        "-modid": "0",
+        "id": "290438938867154571708258576964823348156",
+        "NameFirst": "Marco",
+        "NameLast": "Privateer",
+        "Status": "Customer",
+        "ContactInfo::": [
+            {
+                "Type": "Email",
+                "Value": "marco@privateer.com"
+            },
+            {
+                "Type": "Phone",
+                "Value": "(262) 789-9271"
+            },
+            {
+                "Type": "URL",
+                "Value": "http://www.marcoprivateer.com"
+            }
+        ]
+    },
+    {
+        "-recid": "500",
+        "-modid": "0",
+        "id": "221335556063996056965375934683649494096",
+        "NameFirst": "Demo",
+        "NameLast": "User",
+        "Status": "Customer",
+        "ContactInfo::": [
+            {
+                "Type": "URL",
+                "Value": "seedcode.com"
+            },
+            {
+                "Type": "Email",
+                "Value": "Demo@User.Com"
+            },
+            {
+                "Type": "Phone",
+                "Value": "(855) 733-3263"
+            },
+            {
+                "Type": "phone",
+                "Value": "(720) 273-8928"
+            },
+            {
+                "Type": "email",
+                "Value": "support@seedcode.com"
+            }
+        ]
+    }
+]
+
+```
 **Deployment and the phpRelay**
 
 You can use fmxj without any PHP providing all the JavaScript is hosted on the FileMaker Server.  In this case, the JavaScript will do the httpXMLRequest POST directly to FileMaker Server's XML API.  If the Guest account is not enabled then you will be prompted for FileMaker authentication from the browser.  This is simple **Basic Authentication**, so may not be suitable for your deployment.  If you're using this deployment, you can simply not pass the optional **phpRelay** argument or pass **null** to it.
@@ -244,7 +324,11 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ...which can now be passed to *postQueryFMS()*.
 
 ###Functions for working with JavaScript Objects
-Additional functions for handling your objects in JavaScript.
+Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and then do then do any kind of script processing in JavaScript. 
+
+These functions are for that client side processing, and should (hopefully) be a continuously growing list!
+
+We do have a php deployment option, but the php page is set up to do as little as possible.  It takes our POST then relays it via cURL to the FileMaker Server. It then returns the raw FMPXMLRESULT for fmxj to convert to objects.  We don't anticipate needing to (or wanting to) enhance this server side processing.  Script running arguments were intentionally left off the findRecordsURL() function for the same reason. We weren't even sure about including the sort argument and supporting Portals as nested arrays, but they are in there now.  Our goal is to do that kind of work here and see this part of the library be the one that grows.
 ***
 **filterObjects ( filters , searchTypes , source )**
 
