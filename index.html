@@ -1,3 +1,4 @@
+
 <!doctype html>
 
 <html>
@@ -197,7 +198,7 @@ fmxj.postQueryFMS ( query , onReadyFunction , onProgressFunction ) ;</code>
 	</div>
 <div class="pad shadow">
 		<pre id="findResult" class="result tall"></pre>
-	</div>
+</div>
 	
 <div class="small">example 2.2: Errors returned as a simple one object array with the Filemaker error code:</div>
 <div class="pad shadow">
@@ -299,9 +300,9 @@ fmxj.postQueryFMS ( edit , callBackFunction ) ;</code>
 		<span>&nbsp</span>
 		<span>uses the data in example 2.1, so make sure that's populated first!</span>
 	</div>
-<div class="pad shadow tall">
-		<pre id="edit" class="result"></pre>
-	</div>
+<div class="pad shadow">
+		<pre id="edit" class="result tall"></pre>
+</div>
 <div class="small">example 3.2: Create a new FileMaker record by not specifying the -recid in the edit object.  If the record creation is succesful on the server, the full object/record will be returned and added to the bottom of the array displayed above in example 2.1.</div>
 <div class="pad shadow">
 	
@@ -321,8 +322,8 @@ fmxj.postQueryFMS ( query , callBackFunction ) ;</code>
 <div>
 		<button id="newbtn" class="shadow">try</button>
 	</div>
-<div class="pad shadow tall">
-		<pre id="newrecord" class="result"></pre>
+<div class="pad shadow">
+		<pre id="newrecord" class="result tall"></pre>
 	</div>
 	
 <div class="separator"></div>
@@ -362,9 +363,8 @@ fmxj.postQueryFMS ( query , callBackFunction ) ;</code>
 		<span>deletes the last object in example 2.1 so make sure that's populated.</span>
 	</div>
 <div class="pad shadow">
-		<pre id="deleterecord" class="result"></pre>
-	</div>
-	
+<pre id="deleterecord" class="result short"></pre>
+</div>
 <div class="separator"></div>
 <div class="function">filterObjects ( filters , searchTypes , source )</div>
 <div class="small">Apply complex property filters to an array of objects using the request syntax.</div>
@@ -727,7 +727,7 @@ fmxj.sortObjects ( sort, dataTypes, source ) ;</code>
 		var recid = (source[i]["-recid"]);
 		document.getElementById("deleterecord").innerHTML =  "" ;
 		var writeResults = function ( js ) {
-			var txt = JSON.stringify(js[0] , null , 4 );
+			var txt = JSON.stringify(js[0] , null , 4 ) + "\n";
 			document.getElementById("deleterecord").innerHTML =  txt ;
 			if (js[0]["ERRORCODE"]==0){
 				source.splice(i,1);
