@@ -202,7 +202,7 @@ var query = fmxj.editRecordURL ( "Events" , "Events" , edit );
 
 **...returns:**
 
--db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit**
+-db=Events&-lay=Events&-recid=6198&Resources=Example A&-edit
 
 **-new Example**
 
