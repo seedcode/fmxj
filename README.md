@@ -327,9 +327,10 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ###Functions for working with JavaScript Objects
 Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and any kind of necessary scripting in JavaScript. 
 
-These functions are for that client side processing, and should (hopefully) be a continuously growing list!
+*We do have a php deployment option, but the php page is set up to do as little as possible.  It takes our POST then relays it via cURL to the FileMaker Server. It then returns the raw FMPXMLRESULT for fmxj to convert to objects.  We don't anticipate needing to (or wanting to) enhance this server side processing.  Script running arguments were intentionally left off the findRecordsURL() function for the same reason. We weren't even sure about including the sort argument and supporting Portals as nested arrays, but they are in there now.*
 
-We do have a php deployment option, but the php page is set up to do as little as possible.  It takes our POST then relays it via cURL to the FileMaker Server. It then returns the raw FMPXMLRESULT for fmxj to convert to objects.  We don't anticipate needing to (or wanting to) enhance this server side processing.  Script running arguments were intentionally left off the findRecordsURL() function for the same reason. We weren't even sure about including the sort argument and supporting Portals as nested arrays, but they are in there now.  Our goal is to do that kind of work here and see this part of the library be the one that grows.
+These functions are for that client side processing, and we anticipate (hope) that this is the part library that grows!
+
 ***
 **filterObjects ( filters , searchTypes , source )**
 
