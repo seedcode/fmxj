@@ -21,7 +21,7 @@ The **postQueryFMS()** is the primary function used for POSTing queries to FileM
 **postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
-* **callBackOnDownload:** (optional) function: The handler function for the httpXMLRequest *e.loaded* progress reports.
+* **callBackOnDownload:** (optional) function: The handler function for the POST *e.loaded* progress reports.
 * **phpRelay:** (optional) object: specifies the server address and name of the php relay file being used.
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
