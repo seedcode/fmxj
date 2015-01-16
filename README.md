@@ -324,7 +324,7 @@ var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
 ...which can now be passed to *postQueryFMS()*.
 
 ###Functions for working with JavaScript Objects
-Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and then do then do any kind of script processing in JavaScript. 
+Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and any kind of necessary scripting in JavaScript. 
 
 These functions are for that client side processing, and should (hopefully) be a continuously growing list!
 
