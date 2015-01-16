@@ -20,20 +20,15 @@ div {
 	display:block;
 	color:white;
 	margin-left:17%;
-	word-wrap: break-word;   
+  
 }
 
 pre {
-	
-	overflow:auto;
 	padding-top:16px;
 	margin:0px;
-
 }
 
-span {
-    word-wrap: break-word;  
-}
+
 
 button {
 	padding-top:6px;
@@ -63,6 +58,7 @@ ol {
 }
 
 code {
+	overflow-x:scroll;
 	font-size:small;
 }
 
