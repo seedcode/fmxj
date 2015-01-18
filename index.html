@@ -656,10 +656,10 @@ fmxj.filterObjects(requests, types, source) ;</code></pre>
 <pre class="line-numbers pad shadow">
 <code class="language-javascript">
 var sort = 	{ 
-				"field1" : "Resource" ,
+				"property1" : "Resource" ,
 				"sort1" : "ascend" ,
 				"type1" : "string",
-				"field2" : "DateStart" ,
+				"property2" : "DateStart" ,
 				"order2" : "descend",
 				"type2" : "date"
 		 	} ;
@@ -751,15 +751,15 @@ fmxj.sortObjects(sort, source) ;</code></pre>
 	//global sort Object display value
 	var sortObjectJs =
 		 	{
-			"field1" : "Resource",
-			"order1" : "ascend",
-			"type1" : "string",
-		 	"field2" : "DateStart",
-			"order2" : "descend",
-			"type2" : "date" 
+			"property1" : "DateStart",
+			"order1" : "descend",
+			"type1" : "date",
+		 	"property2" : "Resource",
+			"order2" : "ascend",
+			"type2" : "string" 
 	   	 	};
 						
-		var sortObject =	{ 
+	var sortObject = { 
 					"field1" : "DateStart" ,
 					"sort1" : "descend" ,
 					"field2" : "id" ,
@@ -972,12 +972,12 @@ fmxj.sortObjects(sort, source) ;</code></pre>
 	var btnFilterRevert = document.getElementById("revertfilterbtn");
 	btnFilterRevert.addEventListener("click",function(){updateSource(source);});
 		
-	//button to filter source
+	//button to sort source
 	var btnSortJs = document.getElementById("sortJsbtn");
 	btnSortJs.addEventListener("click",function(){
 		var current = document.getElementById("sortJsResult").innerHTML;
 		if(!current){alert("Missing source data.  Please populate data in result 2.0 under postQueryFMSon()");return "error";}
-		fmxj.sortObjects(sortObjectJs,{"Resource":"String","DateStart":"Date"},sourceSort);
+		fmxj.sortObjects(sortObjectJs,sourceSort);
 		var display = sourceSort.slice(0,100);
 		document.getElementById("sortJsResult").innerHTML = JSON.stringify(display,null,4);
 	});

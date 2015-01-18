@@ -534,10 +534,13 @@ function sortObjects( sortOrder,  source ) {
 					i++
 					p = sortOrder["property"+i];
 					ad = sortOrder["order"+i];
-					if(sortOrder"type"+i){ t = dataTypes[p] } else { t = "STRING" } ;
+					t = sortOrder["type"+i];
+					
+					if (!t){t="STRING"};
 							
 					if (!a[p]) { var x = "" } else { var x = a[p] } ; 
 					if (!b[p]) { var y = "" } else { var y = b[p] }; 
+
 					
 					//ignore case
 					if ( t.toUpperCase() === "STRING" ) { 
