@@ -18,7 +18,7 @@ POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP rel
 The **postQueryFMS()** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
-**postQueryFMS ( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
+**postQueryFMS( query, callBackOnReady [, callBackOnDownload, phpRelay] )**
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
 * **callBackOnDownload:** (optional) function: The handler function for the POST *e.loaded* progress reports.
@@ -197,13 +197,13 @@ User name and password can be passed as part of the object.  They are sent via P
 var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];
 
 //build query from our array
-var query = fmxj.findRecordsURL ( "Events" , "Events" , requests ); 
+var query = fmxj.findRecordsURL( "Events" , "Events" , requests ); 
 
 //specify FileMaker Server we're posting to
 var relay = {"php":"fmxjRelay.php","server":"seedcode.com"};  
 
 //now do the POST (without any on Download handler);
-fmxj.postQueryFMS ( query , onReadyFunction , null , relay );
+fmxj.postQueryFMS( query , onReadyFunction , null , relay );
 ```
 
 POSTING FileMaker credentials to a secure server would use an object like this:
@@ -279,7 +279,7 @@ If the -recid property is not specified, then this function will create a -new q
 var edit = {"-recid":"6198","Resources":"Example A"};
 
 //build query from our object, our file and layout name are "Events"
-var query = fmxj.editRecordURL ( "Events" , "Events" , edit );
+var query = fmxj.editRecordURL( "Events" , "Events" , edit );
 ```
 
 **...returns:**
@@ -293,7 +293,7 @@ var query = fmxj.editRecordURL ( "Events" , "Events" , edit );
 var newRecord = {"Resources":"Example A","StartDate":"1/11/2015"};
 
 //build query from our object, our file and layout name are "Events"
-var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );    
+var query = fmxj.editRecordURL( "Events" , "Events" , newRecord );    
 ```
 
 **...returns:**
@@ -303,7 +303,7 @@ var query = fmxj.editRecordURL ( "Events" , "Events" , newRecord );
 ...these queries can now be passed to *postQueryFMS()*.
 
 ***
-**deleteRecordURL ( fileName, layoutName, recid )**
+**deleteRecordURL( fileName, layoutName, recid )**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
