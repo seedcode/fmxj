@@ -374,13 +374,13 @@ fmxj.filterObjects( requests , types , source ) ;
 ```
 
 ***
-**sortObjects ( filters , searchTypes , source )**
+**sortObjects ( filters , source )**
 
-* **sortOrder:** object: specifies the properties to sort and their sort order.
-* **dataTypes:** object: specifies the data type for the property. Supported data types are:
-  * String (default, if not specified)
-  * Number
-  * Date (use for timestamps too)
+* **sortOrder:** object: specifies the properties to sort, their sort order and data types.
+supported values for order are ascend and descend. Supported types are:
+  * string (default, if not specified)
+  * number
+  * date (use for timestamps too)
   * time (of day)
 * **source:** array of objects: objects to be sorted
 
@@ -392,13 +392,11 @@ This function sorts the specified array of objects by 1-n properties, specifying
 var sort = 	{ 
 				"field1" : "Resource" ,
 				"sort1" : "ascend" ,
+				"type1" : "string" ,
 				"field2" : "DateStart" ,
-				"order2" : "descend"
+				"order2" : "descend" ,
+				"type2" : "date"
 		 	} ;
-var dataTypes = {
-					"Resource" : "String" ,
-					"DateStart" : "Date"
-				} ;
 fmxj.sortObjects( sort, dataTypes, source ) ;
 ```
 

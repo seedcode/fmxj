@@ -99,7 +99,7 @@
 		Object
 	</span>	
 	<div class="desc">
-		(Optional) An Object specifying sort fields and their sort order.  Appropriate sort parameters will be appended to the query.  Supported properties are field1-fieldn and order1-ordern (see example 1.3).
+		(Optional) An Object specifying sort fields and their sort order.  Appropriate sort parameters will be appended to the query.  Supported properties are field1-field<span class="n">n</span> and order1-order<span class="n">n</span> (see example 1.3).
 	</div>
 	<div class="divSeparator"></div>
 	<div class="label">
@@ -138,7 +138,7 @@ var requests =	[
 					{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
 					{ "DateStart" : "2/1/2014...2/28/2014" }
 			   	] ;	
-var query = fmxj.findRecordsURL("Events", "Events", requests ) ;</code></pre>
+var query = fmxj.findRecordsURL("Events", "Events", requests) ;</code></pre>
 
 <div class="text">
 	<button id="getfindxml" class="shadow">try this example</button>
@@ -349,7 +349,7 @@ fmxj.postQueryFMS ( query , onReadyFunction , null , relay ) ;</code></pre>
 <!--editRecordURL-->
 	
 <div class="separator"></div>
-<div class="functionTitle">editRecordURL(fileName , layoutName , editObj)</div>
+<div class="functionTitle">editRecordURL(fileName, layoutName, editObj)</div>
 <div class="text">Create a FileMaker -edit or -new query url from a javascript object.</div>
 
 <div class = "pad shadow">
@@ -452,7 +452,7 @@ fmxj.postQueryFMS(query, callBackFunction) ;</code></pre>
 <!--deleteRecordURL-->
 	
 <div class="separator"></div>
-<div class="functionTitle">deleteRecordURL ( fileName , layoutName , recid )</div>
+<div class="functionTitle">deleteRecordURL(fileName, layoutName, recid)</div>
 <div class="text">Create a FileMaker -delete query url from record id.</div>
 
 <div class = "pad shadow">
@@ -519,7 +519,7 @@ fmxj.postQueryFMS(query, callBackFunction) ;</code></pre>
 <!--filterObjects-->
 
 <div class="separator"></div>
-<div class="functionTitle">filterObjects ( filters , searchTypes , source )</div>
+<div class="functionTitle">filterObjects(filters, searchTypes, source)</div>
 <div class="text">Apply complex property filters to an array of objects using the request syntax.</div>
 <div class = "pad shadow">
 	<div class="label">
@@ -604,7 +604,7 @@ fmxj.filterObjects(requests, types, source) ;</code></pre>
 <!--sortObjects-->
 	
 <div class="separator"></div>
-<div class="functionTitle">sortObjects ( sortOrder , dataTypes ,  source )</div>
+<div class="functionTitle">sortObjects(sortOrder, source)</div>
 <div class="text">Sort an array of objects by multiple properties.</div>
 
 <div class = "pad shadow">
@@ -621,8 +621,8 @@ fmxj.filterObjects(requests, types, source) ;</code></pre>
 		An object specifying the properties to sort by, the order by which to sort them, and the data type to apply to the properties sort.
 		<ul class="smallList">
 			<li>property1 - propertyn: property names to sort by in order, property 1 is sorted first, then property 2, etc.</li>
-			<li>order1 - ordern: ascend or descend, default is ascend if not specified</li>
-			<li>type1 - typen: supported type values are
+			<li>order1 - order<span class="n">n</span>: ascend or descend, default is ascend if not specified</li>
+			<li>type1 - type<span class="n">n</span>: supported type values are
 					<ul class="smallList">
 						<li>string</li>
 						<li>number</li>
@@ -643,7 +643,7 @@ fmxj.filterObjects(requests, types, source) ;</code></pre>
 		Array of Objects
 	</span>	
 	<div class="desc">
-		The Array of Objects to be filtered
+		The Array of Objects to be sorted
 	</div>
 
 </div>
@@ -658,14 +658,12 @@ fmxj.filterObjects(requests, types, source) ;</code></pre>
 var sort = 	{ 
 				"field1" : "Resource" ,
 				"sort1" : "ascend" ,
+				"type1" : "string",
 				"field2" : "DateStart" ,
-				"order2" : "descend"
+				"order2" : "descend",
+				"type2" : "date"
 		 	} ;
-var dataTypes = {
-					"Resource" : "String" ,
-					"DateStart" : "Date"
-				} ;
-fmxj.sortObjects(sort, dataTypes, source) ;</code></pre>	
+fmxj.sortObjects(sort, source) ;</code></pre>	
 
 <div class="text">
 		<button id="sortJsbtn" class="shadow">sort</button>
@@ -753,18 +751,14 @@ fmxj.sortObjects(sort, dataTypes, source) ;</code></pre>
 	//global sort Object display value
 	var sortObjectJs =
 		 	{
-			"field1":"Resource",
+			"field1" : "Resource",
 			"order1" : "ascend",
+			"type1" : "string",
 		 	"field2" : "DateStart",
-			"order2" : "descend" 
+			"order2" : "descend",
+			"type2" : "date" 
 	   	 	};
-			
-	var sortTypes =
-		 	{
-			"Resource" : "String",
-		 	"DateStart": "Date" 
-	   	 	};
-			
+						
 		var sortObject =	{ 
 					"field1" : "DateStart" ,
 					"sort1" : "descend" ,

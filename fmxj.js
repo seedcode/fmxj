@@ -37,7 +37,7 @@ return {
 //Optional PHP Proxy/Relay information can be passed via the phpRelay object.
 //user and pass are provided if you're running your own client side auth routine. (Sent via POST).
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
-function postQueryFMS ( query , callBackOnReady , callBackOnDownload , phpRelay ) {
+function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ) {
 		
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
 	var li = query.lastIndexOf("-");
@@ -115,7 +115,7 @@ function postQueryFMS ( query , callBackOnReady , callBackOnDownload , phpRelay 
 //parses a FMPXMLRESULT into JSON adding -recid and -modid properties.
 //FMPXMLRESULT is 50-60% the size of fmresultset, so that's what we're using.
 //function for converting xml onready in queryFMS but could have uses outside of there.
-function convertXml2Js ( xml , isDeleteRequest ){
+function convertXml2Js( xml , isDeleteRequest ){
 
 		var newObject = function (xmlRow , props , recid , modid) {
 			
@@ -267,7 +267,7 @@ function convertXml2Js ( xml , isDeleteRequest ){
 //creates a general -findquery URL for postQueryFMS
 //each object represtents a find request
 //add -omit:1 to the object to make omit request
-function findRecordsURL ( fileName , layoutName , requests , sort , max , skip ){
+function findRecordsURL( fileName , layoutName , requests , sort , max , skip ){
 	
 	//function for building sort string, trturns "" if sort not specified.
 	var addSortURL =  function ( sortObject ){
@@ -363,7 +363,7 @@ function findRecordsURL ( fileName , layoutName , requests , sort , max , skip )
 //returns a general -edit URL for postQueryFMS from an object
 //object properties need to correspond to
 //leaving the record id property (fmxjRecId) blank indicates a new record
-function editRecordURL ( fileName , layoutName , editObj ){
+function editRecordURL( fileName , layoutName , editObj ){
 	
 	var f = 0 ;
 	var q = "";
@@ -389,7 +389,7 @@ function editRecordURL ( fileName , layoutName , editObj ){
 };
 
 //creates a general -delete URL for postQueryFMS
-function deleteRecordURL ( fileName , layoutName , recid ){
+function deleteRecordURL( fileName , layoutName , recid ){
 	var q = "&-recid=" + recid + "&-delete";
 	return "-db=" + fileName + "&-lay=" + layoutName + q ;
 };
@@ -402,7 +402,7 @@ function deleteRecordURL ( fileName , layoutName , recid ){
 //[{"Status":"Active","Resource":"Room A"},{"Status":"New","resource":"Room A"}]
 //returns all objects where the resource is "Room A" and the status is "Active" or "New".
 //specify data types as a single object: {"Status":"String"} unspecified properties will be treated as strings.
-function filterObjects ( filters , searchTypes , source ) {
+function filterObjects( filters , searchTypes , source ) {
 	
 	//if no filters applied, we can just return the source
 	if(!filters){return source};
@@ -476,11 +476,10 @@ function filterObjects ( filters , searchTypes , source ) {
 };
 
 //Sort an Array of objects by property.
-//the "sortOrder" is a single object specifying fields and order
-//{"field1":"StartDate","order1":"Ascend","field2":"Resource","order2":"Descend"}
-//specify data types as a single object: {"Status":"String"} unspecified properties will be treated as strings.
+//the "sortOrder" is a single object specifying properties, order and type
+//{"property1":"StartDate","order1":"Ascend","type1":"date","property2":"Resource","order2":"Descend","type2":"string"}
 //Supported types: String, Number, Date, Time
-function sortObjects ( sortOrder , dataTypes ,  source ) {
+function sortObjects( sortOrder,  source ) {
 
 			var convertDateString = function ( ds ) {var d = new Date(ds);return(Number(d));};
 			var convertTimeString = function ( ts ) {
@@ -533,15 +532,13 @@ function sortObjects ( sortOrder , dataTypes ,  source ) {
 		
 				for ( sf in sortOrder ) {
 					i++
-					p = sortOrder["field"+i];
+					p = sortOrder["property"+i];
 					ad = sortOrder["order"+i];
+					if(sortOrder"type"+i){ t = dataTypes[p] } else { t = "STRING" } ;
 							
 					if (!a[p]) { var x = "" } else { var x = a[p] } ; 
 					if (!b[p]) { var y = "" } else { var y = b[p] }; 
 					
-					//treat as string if not specifued
-					if ( p in dataTypes ) { t = dataTypes[p] } else { t = "STRING" } ;
-
 					//ignore case
 					if ( t.toUpperCase() === "STRING" ) { 
 						if ( x.length > 0 ) { var x = x.toUpperCase()} else { var x = "" }  ;
