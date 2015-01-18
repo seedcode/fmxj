@@ -220,7 +220,7 @@ var relay = {"php":"fmxjRelay.php","server":"seedcode.com","protocol":"https","p
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
 
 ***
-**findRecordsURL ( fileName, layoutName, requests [, sort, max, skip] )**
+**findRecordsURL( fileName, layoutName, requests [, sort, max, skip] )**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
@@ -240,7 +240,7 @@ var requests = [{"Resources":"Example A"},{"Resources":"Example B"}];
 var sort = {"field1":"DateStart","sort1":"descend","field2":"Resource","sort2":"ascend"};
 
 //build query from our array, our file and layout name are "Events"
-var query = fmxj.findRecordsURL ( "Events" , "Events" , requests , sort );
+var query = fmxj.findRecordsURL( "Events" , "Events" , requests , sort );
 ```
 
 **...returns:**
@@ -261,7 +261,7 @@ var requests = [{"Resources":"Example A","-omit":"1"}];
 
 
 ***
-**editRecordURL ( fileName, layoutName, editObj )**
+**editRecordURL( fileName, layoutName, editObj )**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
@@ -316,7 +316,7 @@ This function will create a -delete query for a FileMaker record with the specif
 ```javascript
 //Delete the record with a -recid of 6198.
 //build query from our recid, our file and layout name are "Events"
-var query = fmxj.deleteRecordURL ( "Events" , "Events" , 6198 );
+var query = fmxj.deleteRecordURL( "Events" , "Events" , 6198 );
 ```
 
 **...returns:**
@@ -334,7 +334,7 @@ Functions for handling your objects in JavaScript. One of the ideas of fmxj is t
 These functions are for that client side processing, and we anticipate (hope) that this is the part library that grows!
 
 ***
-**filterObjects ( filters , searchTypes , source )**
+**filterObjects( filters , searchTypes , source )**
 
 * **filters:** array of objects: each object represents a "FileMaker" type requests
 * **searchTypes:** object: specifies the search type to perform on the specified property. Supported types are:
@@ -370,7 +370,7 @@ var requests = [
 					{ "id" : "8CDA64C4-643D-4A64-9336-83BEF07F0CF4" } ,
 			   ] ;
 var types = { "id" : "equals" , "Status" : "equals" } ;
-fmxj.filterObjects ( requests , types , source ) ;
+fmxj.filterObjects( requests , types , source ) ;
 ```
 
 ***
@@ -399,7 +399,7 @@ var dataTypes = {
 					"Resource" : "String" ,
 					"DateStart" : "Date"
 				} ;
-fmxj.sortObjects ( sort, dataTypes, source ) ;
+fmxj.sortObjects( sort, dataTypes, source ) ;
 ```
 
 ***
