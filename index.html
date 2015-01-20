@@ -317,7 +317,7 @@ fmxj.postQueryFMS(query, onReadyFunction) ;</code></pre>
 	<div id="error" class="result"></div>
 </div>
 	
-<div class="text">example 2.3: Portals on the target layout will be returned as nested arrays.  Properties that represent related records will have the Table Occurerence name followed by "::".</div>
+<div class="text">example 2.3: Portals on the target layout will be returned as nested arrays.  Properties that represent related records will be prefixed with a "-" to make sure they don't collide with field names.</div>
 
 <pre class="line-numbers pad shadow">
 <code class="language-javascript">

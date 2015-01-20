@@ -10,6 +10,8 @@
 
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
+fmxj.js does not have any dependencies, but does use <a href="https://github.com/LeaVerou/prism" target="_blank">prism.js</a> for the demo page code blocks.
+
 fmxj.js is designed to do the data interchange work with FileMaker Server in JavaScript. Query strings are created from JavaScript Objects and then sent as a POST to FileMaker's XML Web Publishing Engine. An XML FMPXMLRESULT is returned and converted into JavaScript Objects/JSON by fmxj. The core idea is to do as little as possible on the FileMaker server and shift what we can to the client and JavaScript processes. Supporting FileMaker's Web Publishing can be challenging so removing as many variabes as possible is one of our goals with this project.
 
 POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP relay can be used to get around cross-domain issues and provide more authentication options.  With the goal of doing as little as possible on the Server, we were disappointed to need to rely on PHP at all, but there are some serious limitations to interacting with the FMS XML API directly. See more on the PHP relay below in the **postQueryFMS()** function.
@@ -97,81 +99,72 @@ An optional handler function can be passed as well to report the download progre
 ```json
 [
     {
-        "-recid": "295",
+        "-recid": "1",
+        "-modid": "0",
+        "id": "338794336203723354493363901762748606262",
+        "NameFirst": "Diane",
+        "NameLast": "Ort",
+        "Status": "Customer",
+        "-ContactInfo": [
+            {
+                "Type": "Email",
+                "Value": "diane@ort.com"
+            },
+            {
+                "Type": "Phone",
+                "Value": "(415) 393-6166"
+            },
+            {
+                "Type": "URL",
+                "Value": "http://www.dianeort.com"
+            }
+        ]
+    },
+    {
+        "-recid": "2",
+        "-modid": "0",
+        "id": "262473748365757206478007125406773627812",
+        "NameFirst": "Zane",
+        "NameLast": "Opunui",
+        "Status": "Customer",
+        "-ContactInfo": [
+            {
+                "Type": "Email",
+                "Value": "zane@opunui.com"
+            },
+            {
+                "Type": "Phone",
+                "Value": "(434) 296-3666"
+            },
+            {
+                "Type": "URL",
+                "Value": "http://www.zaneopunui.com"
+            }
+        ]
+    },
+    {
+        "-recid": "3",
         "-modid": "1",
-        "id": "236685826794508408193649246489835084122",
-        "NameFirst": "Branden",
-        "NameLast": "Shortsleeve",
+        "id": "24517341939382263356133708272977092954",
+        "NameFirst": "Lea",
+        "NameLast": "Knighton",
         "Status": "Customer",
-        "ContactInfo::": [
+        "-ContactInfo": [
             {
                 "Type": "Email",
-                "Value": "branden@shortsleeve.com"
+                "Value": "lea@knighton.com"
             },
             {
                 "Type": "Phone",
-                "Value": "(616) 459-5130"
+                "Value": "(702) 878-2130"
             },
             {
                 "Type": "URL",
-                "Value": "http://www.brandenshortsleeve.com"
-            }
-        ]
-    },
-    {
-        "-recid": "499",
-        "-modid": "0",
-        "id": "290438938867154571708258576964823348156",
-        "NameFirst": "Marco",
-        "NameLast": "Privateer",
-        "Status": "Customer",
-        "ContactInfo::": [
-            {
-                "Type": "Email",
-                "Value": "marco@privateer.com"
-            },
-            {
-                "Type": "Phone",
-                "Value": "(262) 789-9271"
-            },
-            {
-                "Type": "URL",
-                "Value": "http://www.marcoprivateer.com"
-            }
-        ]
-    },
-    {
-        "-recid": "500",
-        "-modid": "0",
-        "id": "221335556063996056965375934683649494096",
-        "NameFirst": "Demo",
-        "NameLast": "User",
-        "Status": "Customer",
-        "ContactInfo::": [
-            {
-                "Type": "URL",
-                "Value": "seedcode.com"
-            },
-            {
-                "Type": "Email",
-                "Value": "Demo@User.Com"
-            },
-            {
-                "Type": "Phone",
-                "Value": "(855) 733-3263"
-            },
-            {
-                "Type": "phone",
-                "Value": "(720) 273-8928"
-            },
-            {
-                "Type": "email",
-                "Value": "support@seedcode.com"
+                "Value": "http://www.leaknighton.com"
             }
         ]
     }
 ]
-
 ```
 **Deployment and the phpRelay**
 

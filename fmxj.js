@@ -156,7 +156,7 @@ function convertXml2Js( xml , isDeleteRequest ){
 				if(thisObj){
 				//related column
 				//does this property exist already
-					thisObj+="::";
+					thisObj= "-" + thisObj ;
 					children = column.childNodes.length;
 					if(!thisRecord[thisObj]&&children){
 						thisRecord[thisObj]=[];
