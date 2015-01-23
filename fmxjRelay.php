@@ -32,7 +32,7 @@ header('Content-Type: application/xml');
 //FMPXMLRESULT is typically 50-60% the size of fmresultset.
 $xml="/fmi/xml/FMPXMLRESULT.xml";
 
-//this likely won't change although 127.0.0.1 ot eh IP of this machine should work too.
+//this likely won't change although 127.0.0.1 or the IP of this machine should work too.
 $serverAddress="localhost";
 
 //https if SSL
@@ -55,12 +55,13 @@ $lgth = strlen($post);
 $post = substr($post,0,($lgth-$l));
 
 //or hardcoded credentials
+//disable these lines if passing u and p via POST
 $u="fmxj";
 $p="fmxj";
 
 $c = curl_init();
 curl_setopt($c, CURLOPT_URL, $url);
-curl_setopt($c, CURLOPT_TIMEOUT, 20);
+curl_setopt($c, CURLOPT_TIMEOUT, 40);
 curl_setopt($c, CURLOPT_POST, true);
 curl_setopt($c, CURLOPT_POSTFIELDS, $post);
 curl_setopt($c, CURLOPT_USERPWD, $u . ":" . $p);

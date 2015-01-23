@@ -773,6 +773,9 @@ fmxj.sortObjects(sort, source) ;</code></pre>
 	
 	//define PHP relay info if using
 	//var relay = null;
+	//Credentials are not being passed here, but are hardcoded into the PHP file.
+	//If running your own authentication routine in JS you can add u an p properties to this object
+	//They will be sent via POST to the PHP page, which will use them to authenticate to FMS
 	var relay = {"php":"fmxjRelay.php","server":"sc-fms13-fms.fmsdb.com","protocol":"https","port":"443"};
 	
 	//buttons

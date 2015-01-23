@@ -317,7 +317,7 @@ function findRecordsURL( fileName , layoutName , requests , sort , max , skip ){
 
 	
 	//build simple fild all query if none specified and done.
-	if (!requests){ return "-db=" + fileName + "&-lay=" + layoutName + srt + "&-findall" };
+	if (!requests){ return "-db=" + fileName + "&-lay=" + layoutName + srt + sk + mx + "&-findall" };
 	var c = 0 ;
 	var r = 0 ;
 	var ff = 0 ;
