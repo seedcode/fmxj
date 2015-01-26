@@ -176,12 +176,12 @@ fmxj comes with a simple PHP file (fmxjRelay.PHP) that you can use for this.  Yo
 
 **Supported Object Properties Are:**
 
-* php: the php file name (required)
-* server: the filemaker server address (optional, you may use the php file with the JS running locally)
-* protocol: http / https (optional)
-* port: 80/443 (optional)
-* user: FileMaker Account Name (optional)
-* pass: FileMaker Account Password (optional)
+* **"php":** the php file name (required)
+* **"server":** the filemaker server address (optional, you may use the php file with the JS running locally)
+* **"protocol":** http / https (optional)
+* **"port"":** 80/443 (optional)
+* **"user":** FileMaker Account Name (optional)
+* **"pass":** FileMaker Account Password (optional)
 
 User name and password can be passed as part of the object.  They are sent via POST, so can potentially be secured if both the web server and Filemaker Server are using SSL, otherwise passing the credentials like this is equivalent to **Basic Authentication**.  You also have the option of hardcoding the FileMaker credentials in the PHP file so they're not passed via JavaScript at all.
 
