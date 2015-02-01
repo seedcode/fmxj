@@ -1,0 +1,151 @@
+<!doctype html>
+
+<html>
+	
+<head>
+<title>&nbsp;</title>
+
+<script src="../fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../css/fmxj.css">
+<script src="../libraries/prism.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../libraries/prism.css">
+
+</head>
+
+<body>
+	
+<div style="float:right">
+	<a href="http://SeedCode.com" style="cursor:pointer"><img src="../logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;display:block"></a>
+</div>
+<p>
+	<br>
+</p>
+<div class="title">
+	fmxj.js
+</div>
+<div class="sub-title">
+	a JavaScript approach to FileMaker Custom Web Publishing
+</div>
+<div class="sidebar" id="sb"></div>
+	
+	<div class="content">
+		<h3 class="functionTitle">deleteRecordURL(fileName, layoutName, recid)</h3>
+		<div class="text">Create a FileMaker -delete query url by specifying the FileMaker record id. These queries are then passed to the <span class="func">postQueryFMS()</span> function which returns the results as a single object array. The object contains the error code with "0" meaning a succesful delete.</div>
+	</br>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			fileName
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type string">
+			String
+		</span>
+		<div class="desc">
+			A String of the name of the hosted FileMaker file.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			layoutName
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type string">
+			String
+		</span>
+		<div class="desc">
+			A String of the name of the target layout in the specified file.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			recid
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type number">
+			number
+		</span>	
+		<div class="desc">The FileMaker Record ID (-recid) of the record to be deleted.</div>
+		
+		<div class="divSeparator"></div>
+		<div class="argument">example 1</div>
+		<div class="text">Create a -delete query by passing the -recid id to the function. Then POST the query. For this example we'll create a new record to delete (so we don't run out of sample data!)
+		</div>
+<pre class="line-numbers">
+<code class="language-javascript">
+//create new record query from object
+var newRecord =	{
+				"DateStart" : "02/25/2014" ,
+				"DateEnd" : "02/25/2014" ,
+				"Description" : "delete example" ,
+				"Status" : "Open" ,
+				"Summary" : "test delete example"
+				} ;
+var query = fmxj.editRecordURL("Events", "Events", newRecord);
+fmxj.postQueryFMS(query, writeResult);//POST query
+function writeResult (js) { // define handler for results.
+	var record = js[0];
+	updateElement("example1",JSON.stringify(js, null, 4));//write new record to element as JSON
+	if(record["-recid"]){//this is the result for our new record.
+	var recid = record["-recid"];//retrieve record id so we can delete it
+	var dq = fmxj.deleteRecordURL("Events", "Events", recid );//create query
+	fmxj.postQueryFMS(dq, writeResult);//POST query
+	}
+	else//this is the result of our delete request so write it to element
+	{
+	updateElement("example1", JSON.stringify(js, null, 4), true);
+	}
+};</code></pre>
+
+<button id="btn1">try example 1</button>
+<pre id="example1" class="result" style="height:600px;max-height:none"></pre>
+
+</div>
+
+</body>
+
+<footer>
+	
+<script src="../fmxjDemo.js" type="text/javascript"></script> 
+	
+<script>
+
+//button for new record
+var btn = document.getElementById("btn1");
+btn.addEventListener("click",function(){
+start = new Date().getTime();
+var newRecord =	{
+	"DateStart" : "02/25/2014" ,
+	"DateEnd" : "02/25/2014" ,
+	"Description" : "delete example" ,
+	"Status" : "Open" ,
+	"Summary" : "test delete example"
+				} ;
+var query = fmxj.editRecordURL("Events", "Events", newRecord);
+fmxj.postQueryFMS(query, writeResult, null, relay);//POST query
+function writeResult (js,utc) { // define handler for results.
+	var record = js[0];
+	if(record["-recid"]){//this is the result for our new record.
+		var message = createDisplay(js, utc, start);
+		updateElement("example1",message + "\n\n");
+		var recid = record["-recid"];//retrieve record id so we can delete it
+		var dq = fmxj.deleteRecordURL("Events", "Events", recid );//create query
+		fmxj.postQueryFMS(dq, writeResult, null, relay);//POST query
+	}
+	else//this is the result of our delete request so write it to element
+	{
+		var message = createDisplay(js, utc, start);
+		updateElement("example1",message, true);
+	}
+}
+});
+
+	
+</script>
+		
+</footer>
+
+</html>

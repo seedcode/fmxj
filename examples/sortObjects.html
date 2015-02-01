@@ -1,0 +1,182 @@
+<!doctype html>
+
+<html>
+	
+<head>
+<title>&nbsp;</title>
+
+<script src="../fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../css/fmxj.css">
+<script src="../libraries/prism.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../libraries/prism.css">
+
+</head>
+
+<body>
+	<div style="float:right">
+		<a href="http://SeedCode.com" style="cursor:pointer"><img src="../logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;display:block"></a>
+	</div>
+	<p>
+		<br>
+	</p>
+	<div class="title">
+		fmxj.js
+	</div>
+	<div class="sub-title">
+		a JavaScript approach to FileMaker Custom Web Publishing
+	</div>
+	<div class="sidebar" id="sb"></div>
+	
+	<div class="content">
+		<h3 class="functionTitle">sortObjects(filters, searchTypes, source)</h3>
+		<div class="text">Sort an array of objects in JSON format by multiple properties.</div>
+	</br>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			sortOrder
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type object">
+			Object
+		</span>
+		<div class="desc">
+			An object specifying the properties by which to sort the array of objects, the order by which to sort them, and the data type to apply to the properties.
+			<ul class="smallList">
+				<li>property1 - property<span class="bold">n</span>: property names to sort by in order, property 1 is sorted first, then property 2, etc.</li>
+				<li>order1 - order<span class="bold">n</span>: ascend or descend, default is ascend if not specified</li>
+				<li>type1 - type<span class="bold">n</span>: supported type values are
+						<ul class="smallList">
+							<li>string</li>
+							<li>number</li>
+							<li>date (use for timestamps)</li>
+							<li>time (of day)</li>
+						</ul>
+				</li>
+			</ul>
+		</div>
+		<div class="divSeparator"></div>
+	
+		<div class="argument">
+			source
+		</div>
+		<span class="desc">
+			Type:
+		</span>
+		<span class="type array">
+			Array of Objects
+		</span>	
+		<div class="desc">
+			The Array of Objects to be sorted
+		</div>
+		
+		
+		
+		
+		<div class="divSeparator"></div>
+		<div class="argument">example 1</div>
+		<div class="text">Get an array of objects from the server and then sort and unsort it.</div>
+		
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var source = [];
+var requests =	[
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				] ;
+var query = fmxj.findRecordsURL("Events", "Events", requests) ;
+fmxj.postQueryFMS(query, writeResults);
+function writeResults(js){
+	source=js;
+	var display = source.splice(0,500);
+	document.getElementById("example1").innerHTML=JSON.stringify(display, null, 4);
+};</code></pre>
+
+
+<div class="text">Apply Sort</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var sort = 	{ 
+				"property1" : "DateStart" ,
+				"sort1" : "descend" ,
+				"type1" : "date",
+				"property2" : "Resource" ,
+				"order2" : "ascend",
+				"type2" : "string"
+		 	} ;
+fmxj.sortObjects(sort, source) ;
+var display = filter.splice(0,500);
+document.getElementById("example1").innerHTML=JSON.stringify(display, null, 4);</code></pre>
+
+<button id="btn1" style="width:33%">download array</button>
+<button id="btn2" style="width:32%">sort</button>
+<button id="btn3" style="width:33%">unsort</button>
+
+<pre id="example1" class="result tall">
+		
+
+
+</div>
+
+</body>
+
+<footer>
+	
+<script src="../fmxjDemo.js" type="text/javascript"></script> 
+	
+<script>
+	
+	var sourceMessage = "";
+	var source = [];
+	var sourceSort = [];
+	//button for running query and converting xml results to javascript objects
+	var btn = document.getElementById("btn1");
+	btn.addEventListener("click",function(){
+		var num = 500; // number of objects to stringify and display
+		var start = new Date().getTime();
+		var query = fmxj.findRecordsURL("Events", "Events", requests);
+ 		//callback functions for writing results to pre
+		var writeDownload = function(n){
+			document.getElementById("example1").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+		} ;
+		//callback functions for writing results to pre
+		var writeResults = function(js,utc){
+			source = js;
+			sourceSort = JSON.parse(JSON.stringify(js));
+			sourceMessage = createMessage(js, utc, start, num);
+			var sourceDisplay = createDisplay(js, utc, start, num);
+			updateElement("example1",sourceDisplay);
+		};
+		updateElement("example1", "");
+		updateElement("example1","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+		fmxj.postQueryFMS(query, writeResults, writeDownload, relay);
+	});
+	//button to filter source
+	var btnSort = document.getElementById("btn2");
+	btnSort.addEventListener("click",function(){
+		start = new Date().getTime();
+		if(!sourceSort.length){alert("Missing source data. Please download the array first.");return "error";}
+		fmxj.sortObjects(sortObjectJs,sourceSort);
+		var number = sourceSort.length;
+		end = new Date().getTime();
+		var ms = end - start;
+		var message = "<span class=\"resultHeader\">Sorted " + number + " total JS objects in " + ms + 
+		" milliseconds</span>\n\n" + JSON.stringify(sourceSort.slice(0,500),null,4)
+		updateElement("example1",message);
+	});
+	
+	//button to revert filter source
+	var btnFilterRevert = document.getElementById("btn3");
+	btnFilterRevert.addEventListener("click",function(){
+		sourceFilter = source;
+		var sourceDisplay = sourceFilter.slice(0,500);
+		message = sourceMessage + JSON.stringify(sourceDisplay,null,4);
+		updateElement("example1",message);
+	});
+	
+</script>
+		
+</footer>
+
+</html>

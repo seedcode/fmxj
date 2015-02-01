@@ -1,0 +1,306 @@
+<!doctype html>
+
+<html>
+	
+<head>
+<title>&nbsp;</title>
+
+<script src="../fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../css/fmxj.css">
+<script src="../libraries/prism.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../libraries/prism.css">
+
+</head>
+
+<body>
+	<div style="float:right">
+		<a href="http://SeedCode.com" style="cursor:pointer"><img src="../logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;display:block"></a>
+	</div>
+	<p>
+		<br>
+	</p>
+	<div class="title">
+		fmxj.js
+	</div>
+	<div class="sub-title">
+		a JavaScript approach to FileMaker Custom Web Publishing
+	</div>
+	<div class="sidebar" id="sb"></div>
+	
+	<div class="content">
+		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay])</h3>
+		<div class="text">Performs an Ajax call to FileMaker Server. Results are converted to an Array of Objects(JSON) and passed to the callBackOnReady handler function. Query arguments can created from JavaScript Objects using the Query Functions. All fields on the target layout will be returned as object properties. Properties for -recid and -modid will be added automatically to each object in the array.</div>
+	</br>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			query
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type string">
+			String
+		</span>
+		<div class="desc">
+			A String of the query to be POSTed to FileMaker Server. These Strings will typically be created by the fmxj URL finctions.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			callBackOnReady
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type func">
+			Function(js, utc)
+		</span>	
+		<div class="desc" style="margin-bottom:0px;">
+			A Function for handling the returned Array of Objects when ready.  Supported callback arguments are:
+			<ul style="margin-top:4px">
+				<li>
+					<span class="bold">js</span>&nbsp;-&nbsp;<span>the results as an array of objects</span> 
+				</li>
+				<li>
+					<span class="bold">utc</span>&nbsp;-&nbsp;<span>(optional) the utc timestamp when the download was completed.</span> 
+				</li>
+			</ul>
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			callBackOnDownload
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type func">
+			Function(n)
+		</span>	
+		<div class="desc">
+			(Optional) A Function for handling the on progress feedback for the POST. e.loaded is the only feedback property available from FileMaker Server and will be passed to the function as the argument <span class="bold">n</span> if specified.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			phpRelay
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type func">
+			Object
+		</span>	
+		<div class="desc">
+			(Optional) An object of name value pairs specifying the location of the FileMaker Server and the php relay file to use (fmxjRelay.php). Supported properties are:
+			<ul class="smallList">
+				<li>
+					<span class="bold">"server"</span> : server location
+				</li>
+				<li>
+					<span class="bold">"php"</span> : [optional: default fmxjRelay.php]
+				</li>
+				<li>
+					<span class="bold">"protocol"</span> : [optional: default http]
+				</li>
+				<li>
+					<span class="bold">"port"</span> : [optional: default 80]
+				</li>
+				<li>
+					<span class="bold">"user"</span> : [optional: FM Account]
+				</li>
+				<li>
+					<span class="bold">"pass"</span> : [optional: FM Account Password]
+				</li>
+			</ul>
+<p>You can use fmxj without any PHP providing all the JavaScript is hosted on the FileMaker Server.  In this case, the JavaScript will do the httpXMLRequest POST directly to FileMaker Server's XML API.  If the Guest account is not enabled then you will be prompted for FileMaker authentication from the browser.  This is simple <span class="bold">Basic Authentication,</span> so may not be suitable for your deployment.  If you're using this deployment, you can simply not pass the optional <span class="bold">phpRelay</span> argument or pass <span class="bold">null,</span> to it.</p>
+<p>You will need to use the php Relay if your web server and Filemaker server are located remotely from each other.  FileMaker server does not allow cross domain httpXMLRequests directly to the XML API, and changing this involves modifying the Web Server settings.  This is actually pretty easy in Windows/IIS, but not so in Mac/FileMaker Server/Apache.  In either case, dropping a single PHP relay file into the FileMaker Server's root directory is much easier.</p>
+<p>fmxj comes with a simple PHP file (fmxjRelay.PHP) that you can use for this.  You'll then do your POST to the PHP file which will then do the identical POST locally to the FileMaker server using cURL and then relay the XML results back. When doing this you'll need to have the fmxjRelay.php file in your FileMaker WPE's root directory. You'll then need to define an object in JavaScript and pass it as the phpRelay argument.</p>
+<p>User name and password can be passed as part of the object.  They are sent via POST, so can potentially be secured if both the web server and Filemaker Server are using SSL, otherwise passing the credentials like this is equivalent to <span class="bold">Basic Authentication.</span>  You also have the option of hardcoding the FileMaker credentials in the PHP file so they're not passed via JavaScript at all.</p>
+		</div>
+		
+		<div class="divSeparator"></div>
+		<div class="argument">These examples are run from seedcode.com to a remote FileMaker Server (hosted at <a href="https://foxtailtech.com" target="_blank">FoxtailTech</a>) using the php relay.</div>
+		</br>
+		<div class="divSeparator"></div>
+		<div class="argument">example 1</div>
+		<div class="text">Create a HTTP request to the hosted filemaker file "Events". Target layout in the specified file is "Events". Query is created by the <span class="func">findRecordsURL()</span> function and passed as the query argument. The required handler for onreadystateexchange is defined as well as the optional onprogress handler.
+		</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var requests =	[ //create requests for query
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" },
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				];
+var query = fmxj.findRecordsURL("Events", "Events", requests) ; // create query
+
+function onReadyFuntion(js){ //define handler for onready
+	document.getElementById("example1") = JSON.stringify(js, null, 4);
+} ;
+function onProgressFuntion(n){ //define handler for onprogress
+	document.getElementById("example1") += n + " bytes downloaded\n";
+} ;
+fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction); //make call</code></pre>
+
+<button id="btn1">try example 1</button>
+<pre id="example1" class="result tall"></pre>
+</br>
+<div class="divSeparator"></div>
+<div class="argument">example 2</div>
+<div class="text">Looping Ajax Calls. Use Max and Skip in the <span class="func">findRecordsURL()</span> to increment your calls. Takes a little longer overall, but initial results are displayed much more quickly.</div>
+
+<pre class="line-numbers pad shadow" style="max-height:none">
+<code class="language-javascript">
+//sample function for updating pre via loop
+function updateJSONLoop(resultElementID, requests, increment, sort){
+	var sourceLoop = [];
+	var max = increment;
+	var skip = 0;
+	var num = 0;
+	var total = 0;
+	var message = "";
+	var indent = 4; //JSON indent
+	var q = "";
+	//callback functions for writing download.
+	function writeDownload(n){
+		document.getElementById(resultElementID).innerHTML += 
+		"<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+	} ;
+	function writeResult(js){
+		sourceLoop = sourceLoop.concat(js);
+		total = sourceLoop.length;
+		num = js.length;
+		if (num===max) { 
+			//maximum records returned, which meanse we have more to get(probably)
+			//increment skip and run again
+			skip = skip + max;
+			var q = fmxj.findRecordsURL("Events","Events", requests, sort, max, skip);
+			fmxj.postQueryFMS(q,writeResult,null,relay) ;
+		};
+		//Write results to element, first, last and middle ara little different.
+		//displaying collapsed, see fmxjDemo.js for full function code.
+		if (total===max) {*}
+		else if (num!==max) {*}
+		else {*}
+	}; //end writeResult
+	var q = fmxj.findRecordsURL("Events","Events", requests , sort , max , skip  );
+	fmxj.postQueryFMS(q, writeResult, writeDownload, relay);
+};
+var requests =	[
+	{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				] ;
+var sortObject = { 
+	"field1" : "DateStart" ,
+	"sort1" : "ascend" 
+				 } ;
+updateJSONLoop("loopResult", requests, 500, sortObject); //loads 500 records at a time</code></pre>
+
+<button id="btn2">try example 2</button>
+<pre id="example2" class="result tall"></pre>
+</br>
+<div class="divSeparator"></div>
+<div class="argument">example 3</div>
+<div class="text">Errors returned as a simple one object array with the Filemaker error code and description.</div>
+
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var query = fmxj.findRecordsURL("Events", "ShmEvents", requests) ;
+fmxj.postQueryFMS(query, onReadyFunction) ;</code></pre>
+<button id="btn3">try example 3</button>
+<pre id="example3" class="result"></pre>
+<div class="divSeparator"></div>
+<div class="argument">example 4</div>
+<div class="text">Portals on the target layouts are converted to nested arrays. The TO name of the portal's source will be used as the property name, and will be prefixed by a hyphen to make sure it doesn't collide with a field name in the parent table. This puts a higher load on the server, so use sparingly or consider an alternitive structure using the <span class="func">nestObjects()</span> function.</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var query = fmxj.findRecordsURL("Contacts", "Contacts");
+fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
+<button id="btn4">try example 4</button>
+<pre id="example4" class="result tall"></pre>
+
+</div>
+
+</body>
+
+<footer>
+	
+	<script src="../fmxjDemo.js" type="text/javascript"></script> 
+	
+<script>
+
+	//button for running query and converting xml results to javascript objects
+	var btn = document.getElementById("btn1");
+	btn.addEventListener("click",function(){
+		var num = 500; // number of objects to stringify and display
+		var start = new Date().getTime();
+		var query = fmxj.findRecordsURL("Events", "Events", requests);
+ 		//callback functions for writing results to pre
+		var writeDownload = function(n){
+			document.getElementById("example1").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+		} ;
+		//callback functions for writing results to pre
+		var writeResults = function(js,utc){
+			source = js;
+			//preserve the original message
+			sourceMessage = createMessage(js, utc, start, num);
+			var sourceDisplay = createDisplay(js, utc, start, num);
+			updateElement("example1",sourceDisplay);
+		};
+		updateElement("example1", "");
+		updateElement("example1","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+		fmxj.postQueryFMS(query, writeResults, writeDownload, relay);
+	});
+	
+	//button to do looping calls
+	var btnLoop = document.getElementById("btn2");
+	btnLoop.addEventListener("click",function(){
+				
+		var requests =	[
+							{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+							{ "DateStart" : "2/1/2014...2/28/2014" }
+						] ;
+		
+		var sortObject = 	{ 
+							  "field1" : "DateStart" ,
+							  "sort1" : "ascend" 
+							} ;
+						
+		updateJSONLoop("example2", requests, 500 , sortObject ); //loads 500 records at a time.
+
+	});
+	
+	//button for running query and converting xml results to javascript objects with intentional error
+	var btnerror = document.getElementById("btn3");
+	btnerror.addEventListener("click",function(){
+		var urlError = fmxj.findRecordsURL( "Events" , "ShmEvents" , requests ) ;
+		//callback function for writing results to div
+		var writeResults = function ( js ) {
+				var txt = JSON.stringify(js , null , 4 );
+				document.getElementById("example3").innerHTML = txt;
+		} ;
+		document.getElementById("example3").innerHTML =  "" ;
+		fmxj.postQueryFMS(urlError,writeResults,null,relay);
+	});
+	
+	//button for running query and converting xml results to javascript objects
+	var btnContact = document.getElementById("btn4");
+	btnContact.addEventListener("click",function(){
+		//callback functions for writing results to pre
+		var writeDownload = function(n){
+			document.getElementById("example4").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+		} ;
+		//callback for writing results to pre
+		var writeResults = function(js,utc){
+			var message = createDisplay(js, utc, start, js.length);
+			updateElement("example4",message);
+		}
+		var start = new Date().getTime();
+		//var contactRequests = [{"Status":"Customer"}];
+		var q = fmxj.findRecordsURL("Contacts" , "Contacts") ;
+		updateElement("example4","<span class=\"resultHeader\">POST: " + q + "</span>\n\n");
+		fmxj.postQueryFMS(q, writeResults, writeDownload, relay);
+	});
+	
+</script>
+		
+</footer>
+
+</html>

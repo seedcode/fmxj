@@ -29,6 +29,7 @@ return {
 	errorDescription: errorDescription,
 	filterObjects: filterObjects,
 	sortObjects: sortObjects,
+	nestObjects: nestObjects,
 
 }
 
@@ -799,40 +800,42 @@ function sortObjects( sortOrder,  source ) {
 //additonal predicates ban ce assigned as leftKey2, leftKey3, etc.
 function nestObjects( parentArray, childArray, childName, predicates) {
 	
-	var nestTheseObjects = function(p,c){
-		
-		var c = 1;
+	function nestTheseObjects(p,c){
+		var n = 1;
 		var ok = 1;
 		
-		while ( predicates["parentKey" + c] ) {
-			var pv = p[predicates["parentKey" + c]];
-			var cv = c[predicates["childKey" + c]];
+		while ( predicates["parentKey" + n] ) {
+			var pv = p[predicates["parentKey" + n]];
+			var cv = c[predicates["childKey" + n]];
 			if (pv===cv){ok++}
-			c++;
+			n++;
 		};
-		
-		if(c===ok&&c>1){ // all predicates match for this object, so we can nest.
+		if(n===ok&&n>1){ // all predicates match for this object, so we can nest.
 			//does the childName already exist in this Parent?
 			//if not, create it.
 			if(!p[childName]){
 				p[childName]=[]
 			};
-			//push the child Object to the parent.
 			p[childName].push(c);
-		}; //end object match
+			return true;
+		}
 	};
 	
-	var ca = 0;
-	var pa = 0;
+	console.log(childArray.slice(0,10));
 	
-	for ( pa in parentArray ) { // outer loop for parents
-		
-		for ( ca in childArray ) { //inner loop for children
-			nestTheseObjects(parentArray[pa],childArray[ca]);
+	for (var pa in parentArray){
+		var cc = [];
+		var i = 0;
+		var result = [];
+		for (var ca in childArray){
+			result = nestTheseObjects(parentArray[pa],childArray[ca]);
+			if (result){cc.unshift(ca)} //mark this object for removal from child array.
+		};
+		for (i in cc){
+			childArray.splice(cc[i],1); //remove the child records that were nested from the childArray, so next pass a little shorter.
 		};
 	};
-
-	
+	childArray=null;
 };
 
 

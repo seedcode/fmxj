@@ -1,0 +1,331 @@
+<!doctype html>
+
+<html>
+	
+<head>
+<title>&nbsp;</title>
+
+<script src="../fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../css/fmxj.css">
+<script src="../libraries/prism.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../libraries/prism.css">
+
+</head>
+
+<body>
+	
+<div style="float:right">
+	<a href="http://SeedCode.com" style="cursor:pointer"><img src="../logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;display:block"></a>
+</div>
+<p>
+	<br>
+</p>
+<div class="title">
+	fmxj.js
+</div>
+<div class="sub-title">
+	a JavaScript approach to FileMaker Custom Web Publishing
+</div>
+<div class="sidebar" id="sb"></div>
+	
+	<div class="content">
+		<h3 class="functionTitle">findQueryURL(fileName, layoutName,[ requests, sort, max, skip])</h3>
+		<div class="text">Create a complex xml -findquery string from an array of javascript objects. These queries are then passed to the <span class="func">postQueryFMS()</span> function which returns the results as an array of JavaScript Objects (JSON).</div>
+	</br>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			fileName
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type string">
+			String
+		</span>
+		<div class="desc">
+			A String of the name of the hosted FileMaker file.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			layoutName
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type string">
+			String
+		</span>
+		<div class="desc">
+			A String of the name of the target layout in the specified file.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			requests
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type array">
+			Array of Objects
+		</span>	
+		<div class="desc" style="margin-bottom:0px;">
+			(Optional) An Array of Objects where each object represents a FileMaker Find Request. If this arguement is not passed then a <span class="bold">-findall</span> query will be generated.
+		</div>
+	</br>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			sort
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type object">
+			Object
+		</span>	
+		<div class="desc">
+			(Optional) An Object of name value pairs specifying a sort order for the query. Supported properties are field1-field<span class="bold">n</span> and order1-order<span class="bold">n</span> (see example 3 below).
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			max
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type number">
+			Number
+		</span>
+		<div class="desc">
+			(Optional) A Number specifying the maximimum number of parent records to be returned from FileMaker Server. Simmilar to Fetch First in FileMaker's SQL syntax.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			skip
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type number">
+			Number
+		</span>
+		<div class="desc">
+			(Optional) A Number specifying the number of records to skip in the found set before starting to return them. Simmilar yo Offset in FileMaker's SQL Syntax.
+		</div>
+		
+		
+		<div class="divSeparator"></div>
+		<div class="argument">example 1</div>
+		<div class="text">Two request find query for the layout "Events" in the file "Events".
+		</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var requests =	[
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				];	
+var query = fmxj.findRecordsURL("Events", "Events", requests) ;</code></pre>
+<button id="btn1">try example 1</button>
+<pre id="example1" class="result"></pre>
+
+		<div class="divSeparator"></div>
+		<div class="argument">example 2</div>
+		<div class="text">Add additional criteria to requests object, so both requests have the Resource field equal to "Example C".
+		</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var requests =	[
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" },
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+			   	];
+requests[0]["Resource"] = "Example C";
+requests[1]["Resource"] = "Example C";
+var query = fmxj.findRecordsURL("Events", "Events", requests);</code></pre>
+<button id="btn2">try example 2</button>
+<pre id="example2" class="result"></pre>
+
+		<div class="divSeparator"></div>
+		<div class="argument">example 3</div>
+		<div class="text">Specify a sort order for the request by passing an object to the optional sort argument.  Supprted order values are: ascend, descend and valuelist.
+		</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var requests =	[
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				] ;
+var sort =	{ 
+			"field1" : "DateStart" ,
+			"order1" : "descend" ,
+			"field2" : "id" ,
+			"order2" : "ascend"
+			} ;
+var query = fmxj.findRecordsURL("Events", "Events", requests, sort) ;</code></pre>
+<button id="btn3">try example 3</button>
+<pre id="example3" class="result"></pre>
+
+		<div class="divSeparator"></div>
+		<div class="argument">example 4</div>
+		<div class="text">Specify an Omit Request by setting the -omit property to 1.
+		</div>
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var requests =	[
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" } ,
+	{ "Resource" : "Example B" , "-omit" : "1" }
+				] ;
+var query = fmxj.findRecordsURL("Events" ,"Events" ,requests) ;</code></pre>
+<button id="btn4">try example 4</button>
+<pre id="example4" class="result"></pre>
+
+<button id="btn5" style="width:25%">POST example 1</button>
+<button id="btn6" style="width:24%">POST example 2</button>
+<button id="btn7" style="width:25%">POST example 3</button>
+<button id="btn8" style="width:24%">POST example 4</button>
+<pre id="example5" class="result tall"></pre>
+
+
+
+
+
+
+
+</div>
+
+</body>
+
+<footer>
+	
+<script src="../fmxjDemo.js" type="text/javascript"></script> 
+	
+<script>
+	
+//button for running findRecordsURL and getting default query
+var btnxml = document.getElementById("btn1");
+btnxml.addEventListener("click",function(){
+		updateElement("example1", "");
+		//update global query as used by example 2.1
+		var query = fmxj.findRecordsURL( "Events" , "Events" , requests ) ;
+		updateElement("example1", query);
+});
+	
+//button for running findRecordsURL to add criteria and getting xml url
+var btnaddxml = document.getElementById("btn2");
+btnaddxml.addEventListener("click",function(){
+		updateElement("example2", "");
+		var theseRequests = requests;
+		theseRequests[0]["Resource"] = "Example C";
+		theseRequests[1]["Resource"] = "Example C";
+		var query = fmxj.findRecordsURL( "Events" , "Events" , theseRequests ) ; ;
+		updateElement("example2", query);
+});
+	
+//button for running findRecordsURL with sort and getting query url
+var btnsort = document.getElementById("btn3");
+btnsort.addEventListener("click",function(){
+	updateElement("example3", "");
+	var query = fmxj.findRecordsURL("Events" , "Events" , requests , sortObject ) ;
+	updateElement("example3", query);
+});
+
+//button for running findRecordsURL to omit request and getting xml url
+var btnomitxml = document.getElementById("btn4");
+btnomitxml.addEventListener("click",function(){
+	updateElement("example4", "");
+	var query = fmxj.findRecordsURL("Events" , "Events" , requestsOmit ) ;
+	updateElement("example4", query);
+});
+
+
+
+
+
+//button for running query and converting xml results to javascript objects
+var btn = document.getElementById("btn5");
+btn.addEventListener("click",function(){
+	var num = 500; // number of objects to stringify and display
+	var start = new Date().getTime();
+	var query = fmxj.findRecordsURL("Events", "Events", requests);
+	//callback functions for writing results to pre
+	var writeDownload = function(n){
+		document.getElementById("example5").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+	} ;
+	//callback functions for writing results to pre
+	var writeResults = function(js,utc){
+		var sourceDisplay = createDisplay(js, utc, start, num);
+		updateElement("example5",sourceDisplay);
+	};
+	updateElement("example5", "");
+	updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+	fmxj.postQueryFMS(query, writeResults, writeDownload, relay);
+});
+
+//button for running query and converting xml results to javascript objects
+var btn = document.getElementById("btn6");
+btn.addEventListener("click",function(){
+	var num = 500; // number of objects to stringify and display
+	var start = new Date().getTime();
+	requests[0]["Resource"] = "Example C";
+	requests[1]["Resource"] = "Example C";
+	var query = fmxj.findRecordsURL("Events", "Events", requests);
+	//callback functions for writing results to pre
+	var writeDownload = function(n){
+		document.getElementById("example5").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+	} ;
+	//callback functions for writing results to pre
+	var writeResults = function(js,utc){
+		var sourceDisplay = createDisplay(js, utc, start, num);
+		updateElement("example5",sourceDisplay);
+	};
+	updateElement("example5", "");
+	updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+	fmxj.postQueryFMS(query, writeResults, writeDownload, relay);
+});
+
+//button for running query and converting xml results to javascript objects
+var btn = document.getElementById("btn7");
+btn.addEventListener("click",function(){
+	var num = 500; // number of objects to stringify and display
+	var start = new Date().getTime();
+	var query = fmxj.findRecordsURL("Events", "Events", requests, sortObject);
+	//callback functions for writing results to pre
+	var writeDownload = function(n){
+		document.getElementById("example5").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+	} ;
+	//callback functions for writing results to pre
+	var writeResults = function(js,utc){
+		var sourceDisplay = createDisplay(js, utc, start, num);
+		updateElement("example5",sourceDisplay);
+	};
+	updateElement("example5", "");
+	updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+	fmxj.postQueryFMS(query, writeResults, writeDownload, relay);
+});
+
+
+//button for running query and converting xml results to javascript objects
+var btn = document.getElementById("btn8");
+btn.addEventListener("click",function(){
+	var num = 500; // number of objects to stringify and display
+	var start = new Date().getTime();
+	var query = fmxj.findRecordsURL("Events", "Events", requestsOmit);
+	//callback functions for writing results to pre
+	var writeDownload = function(n){
+		document.getElementById("example5").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+	} ;
+	//callback functions for writing results to pre
+	var writeResults = function(js,utc){
+		var sourceDisplay = createDisplay(js, utc, start, num);
+		updateElement("example5",sourceDisplay);
+	};
+	updateElement("example5", "");
+	updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+	fmxj.postQueryFMS(query, writeResults, writeDownload, relay);
+});
+
+	
+</script>
+		
+</footer>
+
+</html>

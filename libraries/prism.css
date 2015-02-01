@@ -14,7 +14,7 @@ pre[class*="language-"] {
 	white-space: pre;
 	word-spacing: normal;
 	word-break: normal;
-	line-height: 1.5;
+	line-height: 1.4;
 
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
@@ -268,6 +268,6 @@ pre.line-numbers > code {
 			display: block;
 			padding-right: 0.7em;
 			text-align: right;
-			line-height: 1.65;
+			line-height: 1.5;
 
 		}

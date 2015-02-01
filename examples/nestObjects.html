@@ -1,0 +1,171 @@
+<!doctype html>
+
+<html>
+	
+<head>
+<title>&nbsp;</title>
+
+<script src="../fmxj.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../css/fmxj.css">
+<script src="../libraries/prism.js" type="text/javascript"></script> 
+<link rel="stylesheet" type="text/css" href="../libraries/prism.css">
+
+</head>
+
+<body>
+	<div style="float:right">
+		<a href="http://SeedCode.com" style="cursor:pointer"><img src="../logowhite.png" alt="SeedCode Logo" style="width:290px;height:93px;display:block"></a>
+	</div>
+	<p>
+		<br>
+	</p>
+	<div class="title">
+		fmxj.js
+	</div>
+	<div class="sub-title">
+		a JavaScript approach to FileMaker Custom Web Publishing
+	</div>
+	<div class="sidebar" id="sb"></div>
+	
+	<div class="content">
+		<h3 class="functionTitle">nestObjects(parentArray, childArray, childName, predicates)</h3>
+		<div class="text">Nest one array of objects into another as a property an using SQL like Join.</div>
+	</br>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			parentArray
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class = "type array">
+			Array of Objects
+		</span>
+		<div class="desc">
+			An Array of Objects that will be the parent objects and have the child array nested in them.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			childArray
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type array">
+			Array of Objects
+		</span>	
+		<div class="desc" style="margin-bottom:0px;">
+			An Array of Objects to be nested into the above parent objects.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			childName
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type string">
+			String
+		</span>	
+		<div class="desc">
+			The name of the property of the child array in the parent object.
+		</div>
+		<div class="divSeparator"></div>
+		<div class="argument">
+			predicates
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type object">
+			Object
+		</span>	
+		<div class="desc">
+			An object specifying the match keys to join parent and child objects. Only equijoin matches supported.
+			<ul class="smallList">
+				<li>parentKey1 - parentKey<span class="bold">n</span>: match key properties in the parent objects.</li>
+				<li>childKey1 - childKey<span class="bold">n</span>: match key properties in the child objects.</li>
+			</ul>
+		</div>
+		
+		<div class="divSeparator"></div>
+		<div class="argument">example 1</div>
+		<div class="text">Call Contacts and Contact Info in separate calls with no portals on the layouts, then stitch together in JS.  Compare to example 2.4 where Contact Info is gathered via Portal.  This operation (7.1) tests a little bit slower overall, but the footprint on the server is smaller, so should scale better with multiple users.  You also may not need nest them all at once and right away like in this example.</div>
+		
+<pre class="line-numbers pad shadow">
+<code class="language-javascript">
+var contacts = [];
+var q1 = fmxj.findRecordsURL("Contacts", "ContactsNoPortal");
+var q2 = fmxj.findRecordsURL("Contacts", "ContactInfo");
+function writeDownload(n){
+	document.getElementById("nestResult").innerHTML +=  n + " bytes downloaded" ;
+} ;
+function updateContacts(js){
+	function updateContactInfo(js){
+		fmxj.nestObjects(contacts, js, "Contacts", {"parentKey1": "id", "childKey1": "id_Contact"});
+		document.getElementById("nestResult").innerHTML += JSON.stringify(contacts,null, 4 );
+	};
+	fmxj.postQueryFMS(q2, updateContactInfo, null, relay);
+	contacts = js;
+};
+fmxj.postQueryFMS(q1, updateContacts, writeDownload, relay);
+}
+};</code></pre>
+
+
+<button id="btn1">try this example</button>
+
+
+<pre id="example1" class="result tall">
+		
+
+
+</div>
+
+</body>
+
+<footer>
+	
+<script src="../fmxjDemo.js" type="text/javascript"></script> 
+	
+<script>
+	
+//button to make 2 calls and nest the results
+var btnNest = document.getElementById("btn1");
+btnNest.addEventListener("click",function(){
+	var start = new Date().getTime();
+	updateElement("example1", "");
+	var contacts = [];
+	var sourceMessage = "";
+	var q1 = fmxj.findRecordsURL("Contacts", "ContactsNoPortal");
+	var q2 = fmxj.findRecordsURL("Contacts", "ContactInfo");
+	updateElement("example1", "POST: " + q1 + "\n\n" );
+	function writeDownload(n){
+		document.getElementById("example1").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+	} ;
+	function updateContacts(js,utc){
+		function updateContactInfo(js,utc){
+			sourceMessage = "<span class=\"resultHeader\">Contact Info</span>\n" + createMessage(js, utc, start);
+			document.getElementById("example1").innerHTML += sourceMessage;
+			var ns = new Date().getTime();
+			fmxj.nestObjects(contacts, js, "Contacts", {"parentKey1": "id", "childKey1": "id_Contact"});
+			var end = new Date().getTime();
+			var message = "<span class=\"resultHeader\">Arrays nested in " + (end-ns) + " milliseconds.</span>\n" +
+						  "<span class=\"resultHeader\">" + (end-start) + " total milliseconds.</span>\n\n"
+			document.getElementById("example1").innerHTML += message;
+			document.getElementById("example1").innerHTML += JSON.stringify(contacts,null, 4 );
+		};
+		fmxj.postQueryFMS(q2, updateContactInfo, null, relay);
+		contacts = js;
+		sourceMessage = "<span class=\"resultHeader\">Contacts</span>\n" + createMessage(js, utc, start);
+		updateElement("example1",sourceMessage);
+	};
+	fmxj.postQueryFMS(q1, updateContacts, writeDownload, relay);
+	}
+);
+	
+</script>
+		
+</footer>
+
+</html>

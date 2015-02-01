@@ -11,11 +11,12 @@
 //They will be sent via POST to your PHP page, which will use them to authenticate to FMS
 //This is the SeedCode Test Server so be kind to it!!
 var relay = {"php":"fmxjRelay.php","server":"sc-fms13-fms.fmsdb.com","protocol":"https","port":"443"};
+//var relay = {"php":"fmxjRelay.php","server":"192.168.1.10"};
 
 
 //***************FUNCTIONS*********************
 
-var updateJSONLoop = function(resultElementID, requests, increment, sort){
+function updateJSONLoop(resultElementID, requests, increment, sort){
 	var sourceLoop = [];
 	var max = increment;
 	var skip = 0;
@@ -24,15 +25,12 @@ var updateJSONLoop = function(resultElementID, requests, increment, sort){
 	var message = "";
 	var indent = 4; //JSON indent
 	var q = "";
-	
 	var start = new Date().getTime();
 	var split = new Date().getTime();
-	
 	//callback functions for writing download.
-	var writeDownload = function(n){
+	function writeDownload(n){
 		document.getElementById(resultElementID).innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
 	} ;
-			
 	function writeResult(js,utc){
 		var dlc = utc-split
 		split = new Date().getTime();
@@ -73,19 +71,14 @@ var updateJSONLoop = function(resultElementID, requests, increment, sort){
 			cc + " milliseconds.</span>\n";
 			document.getElementById(resultElementID).innerHTML = message + "\n\n" + displayJSON ;
 		}
-
 	}; //end writeResult
-	
 	var q = fmxj.findRecordsURL("Events","Events", requests , sort , max , skip  );
-	
 	//clear values
 	document.getElementById(resultElementID).innerHTML = "<span class=\"resultHeader\">POST: " + q + "</span>\n\n";
-	
-	fmxj.postQueryFMS(q, writeResult, writeDownload, relay) ;
-	
+	fmxj.postQueryFMS(q, writeResult, writeDownload, relay);
 };
 
-var createMessage = function(js, utc, start, num){
+function createMessage(js, utc, start, num){
 	var end = new Date().getTime();
 	var dlc = utc - start;
 	var cc = end - utc;
@@ -95,25 +88,26 @@ var createMessage = function(js, utc, start, num){
 	var message = "<span class=\"resultHeader\">" + total + 
 	" FileMaker records downloaded in " + dlc + " milliseconds</span>\n" +
 	"<span class=\"resultHeader\">" +  
-	"converted to JS objects in " + cc + " milliseconds</span>\n" +
+	"FMPXMLRESULT converted to JS objects in " + cc + " milliseconds</span>\n" +
 	"<span class=\"resultHeader\">Displaying the first " + num + " \"stringified\" objects.</span>\n" +
 	"<span class=\"resultHeader\">" + (end - start) + " total milliseconds.</span>\n\n";
 	return message;
 	
-}
+};
 
-var createDisplay = function(js, utc, start, num){
+function createDisplay(js, utc, start, num){
 	var indent = 4; // JSON indent
 	var display = JSON.stringify(js.slice(0,num), null, indent);
 	var message = createMessage(js,utc,start,num);
 	return message+display ;
 };
 
-var updateElement = function(elementID, value){
-	document.getElementById(elementID).innerHTML = value;
-}
+function updateElement(id, value, append){
+	if(append){document.getElementById(id).innerHTML += value;}
+	else{document.getElementById(id).innerHTML = value;}
+};
 
-var editQuery = function(source){
+function editQuery(source){
 	var firstRecord = source[0];
 	var recid = firstRecord["-recid"];
 	var recordStatus = firstRecord["Status"] ;
@@ -126,7 +120,11 @@ var editQuery = function(source){
 	edit["Status"] = newStatus ;
 	edit["-modid"] = recordModId ;
 	return fmxj.editRecordURL( "Events" , "Events" , edit ) ;
-}
+};
+
+//***************Load Sidebar*********************
+
+updateElement("sb",'<ul style="margin-top:0px;"><li class="sidebaritem"><a href="../index.html">Home</a></li><li class="sidebaritem">Query Functions<ul><li class="smallitem"><a href="/examples/findQuery.html">findQueryURL()</a></li><li class="smallitem"><a href="/examples/editQuery.html">editQueryURL()</a></li><li class="smallitem"><a href="/examples/deleteQuery.html">deleteQueryURL()</a></li></ul></li><li class="sidebaritem">Server Functions<ul><li class="smallitem" id="pql"><a href="/examples/postQuery.html">postQueryFMS()</a></li></ul></li><li class="sidebaritem">Object Functions<ul><li class="smallitem"><a href="/examples/filterObjects.html">filterObjects()</a></li><li class="smallitem"><a href="/examples/sortObjects.html">sortObjects()</a></li><li class="smallitem"><a href="/examples/nestObjects.html">nestObjects()</a></li></ul></li></ul>');
 
 //***************SAMPLE DATA*********************
 
@@ -178,7 +176,7 @@ var sortObjectJs =
 var sortObject =	
 		{
 			"field1" : "DateStart" ,
-			"sort1" : "descend" ,
+			"order1" : "descend" ,
 			"field2" : "id" ,
 			"order2" : "ascend"
 		} ;
