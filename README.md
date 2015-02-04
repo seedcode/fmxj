@@ -386,7 +386,7 @@ This function sorts the specified array of objects by 1-n properties, specifying
 ``` javascript
 var sort = 	{ 
 				"field1" : "Resource" ,
-				"sort1" : "ascend" ,
+				"order1" : "ascend" ,
 				"type1" : "string" ,
 				"field2" : "DateStart" ,
 				"order2" : "descend" ,
