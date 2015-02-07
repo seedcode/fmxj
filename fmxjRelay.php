@@ -41,6 +41,9 @@ $http="http";
 //could be 443 if SSL
 $port=80;
 
+//false if disable verifying a SSL/TLS certificate chain
+$verifySSL=true;
+
 $url="$http://$serverAddress$xml";
 
 if (isset($_POST)){
@@ -65,12 +68,12 @@ curl_setopt($c, CURLOPT_TIMEOUT, 40);
 curl_setopt($c, CURLOPT_POST, true);
 curl_setopt($c, CURLOPT_POSTFIELDS, $post);
 curl_setopt($c, CURLOPT_USERPWD, $u . ":" . $p);
-curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($c, CURLOPT_SSL_VERIFYHOST, 0);
+if ($verifySSL === false) {
+    curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($c, CURLOPT_SSL_VERIFYHOST, 0);
+}
 curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 $result=curl_exec($c);
 curl_close($c);
 echo $result; 
 };
-
-?>
