@@ -397,6 +397,25 @@ fmxj.sortObjects(sort, dataTypes, source) ;
 
 ***
 
+**nestObjects(parentArray, childArray, childName, predicates)**
+
+* **parentArray:** array of object: An Array of Objects that will be the parent objects and have the child array nested in them.
+* **childArray:** array of objects: An Array of Objects to be nested into the above parent objects.
+* **childArray:** string: The name of the property of the child array in the parent object.
+* **predicates:** object: An object specifying the match keys to join parent and child objects. Only equijoin matches supported.
+  * parentKey1 - parentKeyn: match key properties in the parent objects.
+  * childKey1 - childKeyn: match key properties in the child objects.
+
+Nest one array of objects into another as a property a SQL like Join.
+
+**Example**
+
+``` javascript
+fmxj.nestObjects(contacts, contactinfo, "ContactInfo", {"parentKey1": "id", "childKey1": "id_Contact"});
+```
+
+***
+
 
 
 
