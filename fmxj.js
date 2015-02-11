@@ -40,7 +40,7 @@ return {
 //Optional PHP Proxy/Relay information can be passed via the phpRelay object.
 //user and pass are provided if you're running your own client side auth routine. (Sent via POST).
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
-function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ) {
+function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , customObject) {
 		
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
 	var li = query.lastIndexOf("-");
@@ -119,7 +119,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay )
 //parses a FMPXMLRESULT into JSON adding -recid and -modid properties.
 //FMPXMLRESULT is 50-60% the size of fmresultset, so that's what we're using.
 //function for converting xml onready in queryFMS but could have uses outside of there.
-function convertXml2Js( xml , isDeleteRequest ){
+function convertXml2Js( xml , isDeleteRequest , customObject ){
 		
 		//rather than parsing errors.
 		if(!xml){return""};
