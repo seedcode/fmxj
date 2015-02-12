@@ -20,11 +20,13 @@ POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP rel
 The **postQueryFMS()** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
-**postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay])**
+**postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, classResult])**
+
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
 * **callBackOnDownload:** (optional) function: The handler function for the POST *e.loaded* progress reports.
 * **phpRelay:** (optional) object: specifies the server address and name of the php relay file being used.
+* **classResult:** (optional) object: defines "classes" the result objects rather then letting the FileMaker layout do this.
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
@@ -210,6 +212,63 @@ var relay = {"php":"fmxjRelay.php","server":"seedcode.com","protocol":"https","p
 
 **Remember!**  Both the Web Server and the FileMaker Server need to be runnning SSL for this transaction to be secure.  There's a good article on this [here](http://www.troyhunt.com/2013/05/your-login-form-posts-to-https-but-you.html).
 
+**classResult Example**
+
+Specify an object "class" for the results using the below syntax and pass it as the resultClass argument.
+
+```javascript
+var requests =	[
+	{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				] ;
+var query = fmxj.findRecordsURL("Events", "Events", requests);
+//define object class for the results and pass that as the class argument.
+var fcObject = 	{
+	"id" : function(f){return f("id")},
+	"title" : function(f){return f("Summary")},
+	"allDay" : function(f){
+		if(f("TimeStart").length){
+			return false
+		}
+		else{
+			return true
+		};
+	},
+	"start" : function(f){
+		var d = new Date(f("DateStart") + " " + f("TimeStart"));
+		return d.toISOString()
+						},
+	"end" : function(f){
+		var d = new Date(f("DateEnd") + " " + f("TimeEnd"));
+		return d.toISOString()
+						},
+	"description" : function(f){return f("Description")},
+	"resource" : function(f){return f("Resource")},
+	"status" : function(f){return f("Status")},
+	"fmRecordId" : function(f){return f("-recid")},
+	"fmModId" : function(f){return f("-modid")},
+};
+fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);
+```
+
+results in objects like this:
+
+```json
+{ 
+	"id": "7A2E442C-3782-497F-A539-4495F1B28806",
+	"title": "Begin Production",
+	"allDay": true,
+    "start": "2014-02-09T07:00:00.000Z",
+	"end": "2014-02-09T07:00:00.000Z",
+	"description": "",
+	"resource": "Example A",
+	"status": "Open",
+	"fmRecordId": "6198",
+	"fmModId": "178"
+}
+```
+
+***
 ##Query Building Functions
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
@@ -321,7 +380,7 @@ var query = fmxj.deleteRecordURL("Events" , "Events" , 6198);
 ...which can now be passed to *postQueryFMS()*.
 
 ***
-###Functions for working with JavaScript Objects
+##Functions for working with JavaScript Objects
 Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and any kind of necessary scripting in JavaScript. 
 
 *We do have a php deployment option, but the php page is set up to do as little as possible.  It takes our POST then relays it via cURL to the FileMaker Server. It then returns the raw FMPXMLRESULT for fmxj to convert to objects.  We don't anticipate needing to (or wanting to) enhance this server side processing.  Script running arguments were intentionally left off the findRecordsURL() function for the same reason. We weren't even sure about including the sort argument and supporting Portals as nested arrays, but they are in there now.*
