@@ -26,6 +26,7 @@ return {
 	findRecordsURL: findRecordsURL,
 	editRecordURL: editRecordURL,
 	deleteRecordURL: deleteRecordURL,
+	layoutInfoURL: layoutInfoURL,
 	errorDescription: errorDescription,
 	filterObjects: filterObjects,
 	sortObjects: sortObjects,
@@ -41,11 +42,14 @@ return {
 //user and pass are provided if you're running your own client side auth routine. (Sent via POST).
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
 function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass ) {
-		
+	
+	//check what query type we are as we'll do custom results for some (delete findany)	
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
 	var li = query.lastIndexOf("-");
 	var parm = query.substring(li,query.length);
-	if (parm==="-delete"){var del=true};
+	if (parm!=="-delete"&&parm!=="-findany"){
+		parm = null;
+	};
 	
 	//if a proxy object is specified, then we'll send our POST to fmxjRelay.PHP page, so update query value.  
 	//Otherwise we're posting locally right to FMS via XML.
@@ -100,7 +104,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 	{
 		var utc = new Date().getTime();
-	    var js = convertXml2Js(xmlhttp.responseXML,del,resultClass);
+	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass);
 		xmlhttp = null;
 		if ( callBackOnReady && js ) { callBackOnReady ( js , utc ) } ;
 	}
@@ -119,7 +123,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 //parses a FMPXMLRESULT into JSON adding -recid and -modid properties.
 //FMPXMLRESULT is 50-60% the size of fmresultset, so that's what we're using.
 //function for converting xml onready in queryFMS but could have uses outside of there.
-function convertXml2Js( xml , isDeleteRequest , resultClass ){
+function convertXml2Js( xml , requestType , resultClass ){
 		
 		//rather than parsing errors.
 		if(!xml){return""};
@@ -266,16 +270,19 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 			
 			var resultObj = {};
 			var index = {};
+			var model = {};
 			var nameTag = "NAME";
+			var typeTag = "TYPE";
 			var fieldCount = FMXMLMetaData.childNodes.length ;
 			var result = [];
 			var i = 0 ;
-			var field = ""
+			var field = "";
+			var type = "";
 			while ( i < fieldCount ){
 				field = FMXMLMetaData.childNodes[i].getAttribute(nameTag);
+				type = FMXMLMetaData.childNodes[i].getAttribute(typeTag);
 				//related field
 				if(field.indexOf("::")>0){
-				
 					var p = field.indexOf("::");
 					var t = field.substring(0,p);
 					var f = field.substring(p+2);
@@ -284,6 +291,7 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 				//local field
 				else
 				{
+					model[field] = type;
 					var fieldObject = newFieldObject(field,null);
 				}
 				index[field] = i;
@@ -292,6 +300,7 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 			}
 			resultObj["index"] = index;
 			resultObj["items"] = result;
+			resultObj["model"] = model;
 			
 			return resultObj ;
 		};
@@ -308,13 +317,25 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 		var id = "";
 		var mid = "";
 
+		var metaObject = {};
 		var result = [];
 		var row = {};
 		var c = 0 ;
 		
+		var isDeleteRequest = false;
+		if (requestType==="-delete"){
+			var isDeleteRequest = true;
+		};
+		
+		var isFindAnyRequest = false;
+		if (requestType==="-findany"){
+			var isFindAnyRequest = true;
+		};
+		
+		
 		//error check return error code object if not 0 OR delete request.
 		var error = xml.getElementsByTagName(errorCodeTag)[0].childNodes[0].nodeValue;
-		if ( error!=0 | isDeleteRequest ) {
+		if ( error!=0 || isDeleteRequest ) {
 			// exit with errcode object
 			var desc = errorDescription(error);
 			var errorObject = {};
@@ -325,8 +346,11 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 			return errorJs;
 		}
 		
+		//define layout model
 		var mData = xml.getElementsByTagName(metadataTag)[0];
 		var fieldObjects = layoutModel(mData);
+		
+		//cycle through XML records and create objects accordingly.
 		var numResults = xml.getElementsByTagName(resultTag)[0].childNodes.length;
 		while ( c < numResults ) {
 			row = xml.getElementsByTagName(recordTag)[c];
@@ -334,8 +358,18 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 			mid = xml.getElementsByTagName(recordTag)[c].getAttribute(modid);
 			result.push ( newObject ( row , fieldObjects , id , mid ) ) ;
 			c++;	
-		};		
-		return result ;
+		};
+		
+		//altrnate formatting depending on request
+		if(isFindAnyRequest){// return as object with two contained objects {model,result}
+			metaObject.model = fieldObjects.model;
+			metaObject.sample = result[0];
+			result = [metaObject];
+			return result;
+		}
+		else{
+			return result ;
+		};
 
 };
 
@@ -466,6 +500,13 @@ function editRecordURL( fileName , layoutName , editObj ){
 //creates a general -delete URL for postQueryFMS
 function deleteRecordURL( fileName , layoutName , recid ){
 	var q = "&-recid=" + recid + "&-delete";
+	return "-db=" + fileName + "&-lay=" + layoutName + q ;
+};
+
+//creates a general -findany URL for postQueryFMS, but we'll just get the metadata
+//we use this instead of FMPXMLLAYOUT does not give us field data types!!!???
+function layoutInfoURL( fileName , layoutName ){
+	var q = "&-findany"
 	return "-db=" + fileName + "&-lay=" + layoutName + q ;
 };
 

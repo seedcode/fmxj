@@ -84,6 +84,7 @@ function createMessage(js, utc, start, num){
 	var cc = end - utc;
 	var tt = end - start;
 	var total = js.length;
+	if(!total){total = 1};
 	if(!num){var num= total};
 	var message = "<span class=\"resultHeader\">" + total + 
 	" FileMaker records downloaded in " + dlc + " milliseconds</span>\n" +
@@ -124,7 +125,7 @@ function editQuery(source){
 
 //***************Load Sidebar*********************
 
-updateElement("sb",'<ul style="margin-top:0px;"><li class="sidebaritem"><a href="../index.html">Home</a></li><li class="sidebaritem">Query Functions<ul><li class="smallitem"><a href="../examples/findRecords.html">findRecordsURL()</a></li><li class="smallitem"><a href="../examples/editRecord.html">editRecordURL()</a></li><li class="smallitem"><a href="../examples/deleteRecord.html">deleteRecordURL()</a></li></ul></li><li class="sidebaritem">Server Functions<ul><li class="smallitem" id="pql"><a href="../examples/postQuery.html">postQueryFMS()</a></li></ul></li><li class="sidebaritem">Object Functions<ul><li class="smallitem"><a href="../examples/filterObjects.html">filterObjects()</a></li><li class="smallitem"><a href="../examples/sortObjects.html">sortObjects()</a></li><li class="smallitem"><a href="../examples/nestObjects.html">nestObjects()</a></li></ul></li></ul>');
+updateElement("sb",'<ul style="margin-top:0px;"><li class="sidebaritem"><a href="../index.html">Home</a></li><li class="sidebaritem">Query Functions<ul><li class="smallitem"><a href="../examples/findRecords.html">findRecordsURL()</a></li><li class="smallitem"><a href="../examples/editRecord.html">editRecordURL()</a></li><li class="smallitem"><a href="../examples/deleteRecord.html">deleteRecordURL()</a></li><li class="smallitem"><a href="../examples/layoutInfo.html">layoutInfoURL()</a></li></ul></li><li class="sidebaritem">Server Functions<ul><li class="smallitem" id="pql"><a href="../examples/postQuery.html">postQueryFMS()</a></li></ul></li><li class="sidebaritem">Object Functions<ul><li class="smallitem"><a href="../examples/filterObjects.html">filterObjects()</a></li><li class="smallitem"><a href="../examples/sortObjects.html">sortObjects()</a></li><li class="smallitem"><a href="../examples/nestObjects.html">nestObjects()</a></li></ul></li></ul>');
 
 //***************SAMPLE DATA*********************
 
