@@ -40,7 +40,7 @@ return {
 //Optional PHP Proxy/Relay information can be passed via the phpRelay object.
 //user and pass are provided if you're running your own client side auth routine. (Sent via POST).
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
-function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , customObject) {
+function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass ) {
 		
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
 	var li = query.lastIndexOf("-");
@@ -100,7 +100,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 	{
 		var utc = new Date().getTime();
-	    var js = convertXml2Js(xmlhttp.responseXML,del);
+	    var js = convertXml2Js(xmlhttp.responseXML,del,resultClass);
 		xmlhttp = null;
 		if ( callBackOnReady && js ) { callBackOnReady ( js , utc ) } ;
 	}
@@ -119,44 +119,42 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 //parses a FMPXMLRESULT into JSON adding -recid and -modid properties.
 //FMPXMLRESULT is 50-60% the size of fmresultset, so that's what we're using.
 //function for converting xml onready in queryFMS but could have uses outside of there.
-function convertXml2Js( xml , isDeleteRequest , customObject ){
+function convertXml2Js( xml , isDeleteRequest , resultClass ){
 		
 		//rather than parsing errors.
 		if(!xml){return""};
 
 		var newObject = function (xmlRow , props , recid , modid) {
 			
-		
 			var dataTag = "DATA";
 			var colTag = "COL";
-			var thisProp = "";
-			var column = "";
-			var data = "";
-			var val = "";
-			var thisPropObj = "";
-			var thisObj = "";
-			var p = 0;
-			var children = 0;
-			var i = 0;
-			var colCount = 0;
-			var propArray = [];
+	
 			var thisRecord = {};
+	
+			var i = 0;
+			var p = 0;
+			var colCount = 0;
 			
-			//simple factory for related records.
-			var newRelatedObject = function(){
-				var o = {};
-				return o;
-			};
-			
-			
-			thisRecord["-recid"]=recid;
-			thisRecord["-modid"]=modid;
-			
-			colCount = xmlRow.childNodes.length;
-			
-			while(i<colCount){
+			var propArray = [];
+	
+			function fmRecordByIndex(i){
+				thisRecord["-recid"]=recid;
+				thisRecord["-modid"]=modid;
+				//simple factory for related records.
+				function newRelatedObject(){
+					var o = {};
+					return o;
+				};
+				var thisPropObj = "";
+				var thisProp = "";
+				var thisObj = "";
+				var column = "";
+				var data = "";
+				var val = "";
 				var c = 0;
-				thisPropObj = props[i];
+				var children = 0;
+				
+				thisPropObj = props["items"][i];
 				thisProp = thisPropObj["property"];
 				thisObj = thisPropObj["object"];
 				column = xmlRow.getElementsByTagName(colTag)[i];
@@ -189,8 +187,68 @@ function convertXml2Js( xml , isDeleteRequest , customObject ){
 					if (data) { val = data.nodeValue } else {val = ""};
 					thisRecord[thisProp]=val;
 				}
+			};
+			
+			function valueByField(fieldName){
+				if (fieldName==="-recid"){return recid};
+				if (fieldName==="-modid"){return modid};
+				function valueByIndex(i){
+					var thisPropObj = "";
+					var thisProp = "";
+					var thisObj = "";
+					var column = "";
+					var data = "";
+					var val = "";
+					var c = 0;
+					var children = 0;
+					thisPropObj = props["items"][i];
+					thisProp = thisPropObj["property"];
+					thisObj = thisPropObj["object"];
+					column = xmlRow.getElementsByTagName(colTag)[i];
+					if(thisObj){
+					//related column
+					//does this property exist already
+						thisObj= "-" + thisObj ;
+						children = column.childNodes.length;
+						thisObj=[];
+	
+						while(c<children){
+							data = column.getElementsByTagName(dataTag)[c].childNodes[0];
+							if (data) { val = data.nodeValue } else {val = ""};
+							thisObj[c][thisProp]=val;	
+							c++
+						};
+						return thisObj;				
+					}
+					else{
+					//local column
+						data = column.getElementsByTagName(dataTag)[0].childNodes[0];
+						if (data) { val = data.nodeValue } else {val = ""};
+						return val;
+					}
+				};
+				var ind = props["index"][fieldName];
+				return valueByIndex(ind);
+			}
+			
+			//console.log(customObject);
+			
+			colCount = xmlRow.childNodes.length;
+			if(resultClass){
+				var cop = Object.getOwnPropertyNames(resultClass);
+				var c = 0
+				for (c in cop){
+					//initialize our new object with these key names.
+					thisRecord[cop[c]] = resultClass[cop[c]](valueByField);
+				};
+
+			}
+			else{
+			while(i<colCount){
+				fmRecordByIndex(i);
 			i++;
 			}
+			};
 			return(thisRecord);
 		};
 				
@@ -205,16 +263,18 @@ function convertXml2Js( xml , isDeleteRequest , customObject ){
 				return o;
 			};
 			
-			var nameTag = "NAME"
+			var resultObj = {};
+			var index = {};
+			var nameTag = "NAME";
 			var fieldCount = FMXMLMetaData.childNodes.length ;
 			var result = [];
 			var i = 0 ;
 			var field = ""
 			while ( i < fieldCount ){
 				field = FMXMLMetaData.childNodes[i].getAttribute(nameTag);
-
 				//related field
 				if(field.indexOf("::")>0){
+				
 					var p = field.indexOf("::");
 					var t = field.substring(0,p);
 					var f = field.substring(p+2);
@@ -225,10 +285,14 @@ function convertXml2Js( xml , isDeleteRequest , customObject ){
 				{
 					var fieldObject = newFieldObject(field,null);
 				}
+				index[field] = i;
 				result.push(fieldObject);
 				i++;
 			}
-			return result ;
+			resultObj["index"] = index;
+			resultObj["items"] = result;
+			
+			return resultObj ;
 		};
 		
 

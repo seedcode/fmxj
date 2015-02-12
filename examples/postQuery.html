@@ -3,7 +3,7 @@
 <html>
 	
 <head>
-<title>&nbsp;</title>
+<title>fmxj</title>
 
 <script src="../fmxj.js" type="text/javascript"></script> 
 <link rel="stylesheet" type="text/css" href="../css/fmxj.css">
@@ -24,19 +24,20 @@
 		fmxj.js
 	</div>
 	<div class="sub-title">
-		a JavaScript approach to FileMaker Custom Web Publishing
+			a JavaScript approach to FileMaker Custom Web Publishing&#8482;
 	</div>
 	<div class="sidebar" id="sb"></div>
 	
 	<div class="content">
+		
 			<h3 class="contentTitle">
 				<a href="https://github.com/seedcode/fmxj" target="_blank"><img src="..\gh.png" alt="gh Logo" style="width:22px;height:22px;padding-right:6px;vertical-align:bottom;">Download on GitHub</a>
 			</h3>
 		<p><div class="divSeparator"></div></p>
 		
-		
-		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay])</h3>
-		<div class="text">Performs an Ajax call to FileMaker Server. Results are converted to an Array of Objects(JSON) and passed to the callBackOnReady handler function. Query arguments can created from JavaScript Objects using the Query Functions. All fields on the target layout will be returned as object properties. Properties for -recid and -modid will be added automatically to each object in the array.</div>
+
+		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, resultClass])</h3>
+		<div class="text">Performs an Ajax call to FileMaker Server. Results are converted to an Array of Objects(JSON) and passed to the callBackOnReady handler function. Query arguments can created from JavaScript Objects using the Query Functions. All fields on the target layout will be returned as object properties. Properties for -recid and -modid will be added automatically to each object in the array. Rather then letting the target FileMaker layout define the object, you can also define your own object (class) and map the FileMaker fields to your object's properties. Then pass this object as the resultClass argument.</div>
 	</br>
 		<div class="divSeparator"></div>
 		<div class="argument">
@@ -124,6 +125,28 @@
 		</div>
 		
 		<div class="divSeparator"></div>
+		<div class="argument">
+			resultClass
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type func">
+			Object
+		</span>	
+		<div class="desc">
+			(Optional) Rather then letting the specified FileMaker layout object define your JavaScript Object, you can define an object/class and map the FileMaker values to it. This can be helpful for adapting your data to a library looking for a specific "class" of object. FileMaker values can be referenced using this syntax: <pre><code class="language-javascript">
+{ 
+	"fmRecordId" : function(f){return f("&lt;fieldname&gt;")
+},
+}</code></pre>
+See example 5 below for more details on this.
+		</div>
+		
+		<div class="divSeparator"></div>
+		
+		
+
 		<div class="argument">These examples are run from seedcode.com to a remote FileMaker Server (hosted at <a href="https://foxtailtech.com" target="_blank">FoxtailTech</a>) using the php relay.</div>
 		</br>
 		<div class="divSeparator"></div>
@@ -223,6 +246,52 @@ fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
 <button id="btn4">try example 4</button>
 <pre id="example4" class="result tall"></pre>
 
+
+<div class="divSeparator"></div>
+<div class="argument">example 5</div>
+<div class="text">
+	Specify an object "class" for the objects rather than using the FileMaker layout and field names to define them. The syntax is below. This can be used for straight field mapping, but also for transformation.
+</div>
+<pre class="line-numbers" style="max-height:none">
+<code class="language-javascript">
+var requests =	[
+	{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+	{ "DateStart" : "2/1/2014...2/28/2014" }
+				] ;
+var query = fmxj.findRecordsURL("Events", "Events", requests);
+//define object class for the results and pass that as the class argument.
+var fcObject = 	{
+	"id" : function(f){return f("id")},
+	"title" : function(f){return f("Summary")},
+	"allDay" : function(f){
+		if(f("TimeStart").length){
+			return false
+		}
+		else{
+			return true
+		};
+	},
+	"start" : function(f){
+		var d = new Date(f("DateStart") + " " + f("TimeStart"));
+		return d.toISOString()
+						},
+	"end" : function(f){
+		var d = new Date(f("DateEnd") + " " + f("TimeEnd"));
+		return d.toISOString()
+						},
+	"description" : function(f){return f("Description")},
+	"resource" : function(f){return f("Resource")},
+	"status" : function(f){return f("Status")},
+	"fmRecordId" : function(f){return f("-recid")},
+	"fmModId" : function(f){return f("-modid")},
+};
+fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);</code></pre>
+<button id="btn5">try example 5</button>
+<pre id="example5" class="result tall"></pre>
+
+
+
+
 </div>
 
 </body>
@@ -232,7 +301,7 @@ fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
 	<script src="../fmxjDemo.js" type="text/javascript"></script> 
 	
 <script>
-
+		
 	//button for running query and converting xml results to javascript objects
 	var btn = document.getElementById("btn1");
 	btn.addEventListener("click",function(){
@@ -304,6 +373,50 @@ fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
 		var q = fmxj.findRecordsURL("Contacts" , "Contacts") ;
 		updateElement("example4","<span class=\"resultHeader\">POST: " + q + "</span>\n\n");
 		fmxj.postQueryFMS(q, writeResults, writeDownload, relay);
+	});
+	
+	//button for running query and converting xml results to javascript objects
+	var btnCustom = document.getElementById("btn5");
+	btnCustom.addEventListener("click",function(){
+		//callback functions for writing results to pre
+		var writeDownload = function(n){
+			document.getElementById("example5").innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
+		} ;
+		//callback for writing results to pre
+		var writeResults = function(js,utc){
+			var message = createDisplay(js, utc, start, js.length);
+			updateElement("example5",message);
+		}
+		var start = new Date().getTime();
+		var fcObject = 	{
+			"id" : function(f){return f("id")},
+			"title" : function(f){return f("Summary")},
+			"allDay" : function(f){
+				if(f("TimeStart").length){
+					return false
+				}
+				else{
+					return true
+				};
+			},
+			"start" : function(f){
+				var d = new Date(f("DateStart") + " " + f("TimeStart"));
+				return d.toISOString()
+								},
+			"end" : function(f){
+				var d = new Date(f("DateEnd") + " " + f("TimeEnd"));
+				return d.toISOString()
+								},
+			"description" : function(f){return f("Description")},
+			"resource" : function(f){return f("Resource")},
+			"status" : function(f){return f("Status")},
+			"fmRecordId" : function(f){return f("-recid")},
+			"fmModId" : function(f){return f("-modid")},
+		};
+		//var contactRequests = [{"Status":"Customer"}];
+		var query = fmxj.findRecordsURL("Events", "Events", requests);
+		updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
+		fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);
 	});
 	
 </script>
