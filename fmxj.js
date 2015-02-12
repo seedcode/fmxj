@@ -287,6 +287,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 					var t = field.substring(0,p);
 					var f = field.substring(p+2);
 					var fieldObject = newFieldObject(f,t);
+					model[field] = type;
 				}
 				//local field
 				else
@@ -317,7 +318,6 @@ function convertXml2Js( xml , requestType , resultClass ){
 		var id = "";
 		var mid = "";
 
-		var metaObject = {};
 		var result = [];
 		var row = {};
 		var c = 0 ;
@@ -350,24 +350,21 @@ function convertXml2Js( xml , requestType , resultClass ){
 		var mData = xml.getElementsByTagName(metadataTag)[0];
 		var fieldObjects = layoutModel(mData);
 		
-		//cycle through XML records and create objects accordingly.
-		var numResults = xml.getElementsByTagName(resultTag)[0].childNodes.length;
-		while ( c < numResults ) {
-			row = xml.getElementsByTagName(recordTag)[c];
-			id = xml.getElementsByTagName(recordTag)[c].getAttribute(recid);
-			mid = xml.getElementsByTagName(recordTag)[c].getAttribute(modid);
-			result.push ( newObject ( row , fieldObjects , id , mid ) ) ;
-			c++;	
-		};
-		
 		//altrnate formatting depending on request
 		if(isFindAnyRequest){// return as object with two contained objects {model,result}
-			metaObject.model = fieldObjects.model;
-			metaObject.sample = result[0];
-			result = [metaObject];
+			result = [fieldObjects.model];
 			return result;
 		}
 		else{
+			//cycle through XML records and create objects accordingly.
+			var numResults = xml.getElementsByTagName(resultTag)[0].childNodes.length;
+			while ( c < numResults ) {
+				row = xml.getElementsByTagName(recordTag)[c];
+				id = xml.getElementsByTagName(recordTag)[c].getAttribute(recid);
+				mid = xml.getElementsByTagName(recordTag)[c].getAttribute(modid);
+				result.push ( newObject ( row , fieldObjects , id , mid ) ) ;
+				c++;	
+			};
 			return result ;
 		};
 
