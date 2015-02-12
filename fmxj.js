@@ -202,6 +202,7 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 					var c = 0;
 					var children = 0;
 					thisPropObj = props["items"][i];
+					if(!thisPropObj){return ""};
 					thisProp = thisPropObj["property"];
 					thisObj = thisPropObj["object"];
 					column = xmlRow.getElementsByTagName(colTag)[i];
@@ -238,8 +239,8 @@ function convertXml2Js( xml , isDeleteRequest , resultClass ){
 				var cop = Object.getOwnPropertyNames(resultClass);
 				var c = 0
 				for (c in cop){
-					//initialize our new object with these key names.
-					thisRecord[cop[c]] = resultClass[cop[c]](valueByField);
+					//initialize our new object with these key names.;
+					thisRecord[cop[c]] = resultClass[cop[c]][0](valueByField);
 				};
 
 			}

@@ -224,29 +224,37 @@ var requests =	[
 var query = fmxj.findRecordsURL("Events", "Events", requests);
 //define object class for the results and pass that as the class argument.
 var fcObject = 	{
-	"id" : function(f){return f("id")},
-	"title" : function(f){return f("Summary")},
-	"allDay" : function(f){
-		if(f("TimeStart").length){
-			return false
-		}
-		else{
-			return true
-		};
-	},
-	"start" : function(f){
-		var d = new Date(f("DateStart") + " " + f("TimeStart"));
-		return d.toISOString()
-						},
-	"end" : function(f){
-		var d = new Date(f("DateEnd") + " " + f("TimeEnd"));
-		return d.toISOString()
-						},
-	"description" : function(f){return f("Description")},
-	"resource" : function(f){return f("Resource")},
-	"status" : function(f){return f("Status")},
-	"fmRecordId" : function(f){return f("-recid")},
-	"fmModId" : function(f){return f("-modid")},
+	"id" : [function(f){return f(this[1])}, "id"],
+	"title" : [function(f){return f(this[1])}, "Summary"],
+	"allDay" : [function(f){ 
+				if(f(this[1]).length){
+					return false;
+				}
+				else{
+					return true;
+				}
+				}, "TimeStart"],
+	"start" :  [function(f){
+				var d = new Date( f(this[1]) + " " + f(this[2]));
+				return d.toISOString()
+				}, "DateStart", "TimeStart"],
+	"end" : [function(f){
+				if(f(this[2]).length){
+					var d = new Date(f(this[1]) + " " + f(this[2]));
+				}
+				else
+				{
+					var d = new Date(f(this[1]));
+					d.setDate(d.getDate()+1);
+				}
+				return d.toISOString()
+				}, "DateEnd", "TimeEnd"],
+	"description" : [function(f){return f(this[1])}, "Description"],
+	"resource" : [function(f){return f(this[1])}, "Resource"],
+	"status" : [function(f){return f(this[1])}, "Status"],
+	"contactid" : [function(f){return f(this[1])}, "id_contact"],
+	"fmRecordId" : [function(f){return f(this[1])}, "-recid"],
+	"fmModId" : [function(f){return f(this[1])}, "-modid"],
 };
 fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);
 ```
@@ -254,15 +262,16 @@ fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);
 results in objects like this:
 
 ```json
-{ 
+{
 	"id": "7A2E442C-3782-497F-A539-4495F1B28806",
 	"title": "Begin Production",
 	"allDay": true,
-    "start": "2014-02-09T07:00:00.000Z",
-	"end": "2014-02-09T07:00:00.000Z",
+	"start": "2014-02-09T07:00:00.000Z",
+	"end": "2014-02-10T07:00:00.000Z",
 	"description": "",
 	"resource": "Example A",
 	"status": "Open",
+	"contactid": "ED3C1292-EBC2-4027-82D2-33ADFB590A1D",
 	"fmRecordId": "6198",
 	"fmModId": "178"
 }
