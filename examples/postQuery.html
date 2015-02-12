@@ -249,50 +249,118 @@ fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
 <div class="divSeparator"></div>
 <div class="argument">example 5</div>
 <div class="text">
-	Specify an object "class" for the objects rather than using the FileMaker layout and field names to define them. The syntax is below. This can be used for straight field mapping, but also for transformation.
+	Specify an object "class" for the objects rather than using the FileMaker layout and field names to define them. This can be used for straight field mapping, but also for transformation. The property name of the object will be the new object property name. The property value is an object specifying the FileMaker fields to be used and a method <span class="func">getValue</span> to specify how the values should be returned. Please use the below syntax for the <span class="func">getValue</span> method.
 </div>
-<pre class="line-numbers" style="max-height:none">
+<pre class="line-numbers" style="max-height:1000">
 <code class="language-javascript">
-var requests =	[
-	{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
-	{ "DateStart" : "2/1/2014...2/28/2014" }
-				] ;
-var query = fmxj.findRecordsURL("Events", "Events", requests);
-//define object class for the results and pass that as the class argument.
 var fcObject = 	{
-	"id" : [function(f){return f(this[1])}, "id"],
-	"title" : [function(f){return f(this[1])}, "Summary"],
-	"allDay" : [function(f){ 
-				if(f(this[1]).length){
-					return false;
-				}
-				else{
-					return true;
-				}
-				}, "TimeStart"],
-	"start" :  [function(f){
-				var d = new Date( f(this[1]) + " " + f(this[2]));
-				return d.toISOString()
-				}, "DateStart", "TimeStart"],
-	"end" : [function(f){
-				if(f(this[2]).length){
-					var d = new Date(f(this[1]) + " " + f(this[2]));
-				}
-				else
-				{
-					var d = new Date(f(this[1]));
-					d.setDate(d.getDate()+1);
-				}
-				return d.toISOString()
-				}, "DateEnd", "TimeEnd"],
-	"description" : [function(f){return f(this[1])}, "Description"],
-	"resource" : [function(f){return f(this[1])}, "Resource"],
-	"status" : [function(f){return f(this[1])}, "Status"],
-	"contactid" : [function(f){return f(this[1])}, "id_contact"],
-	"fmRecordId" : [function(f){return f(this[1])}, "-recid"],
-	"fmModId" : [function(f){return f(this[1])}, "-modid"],
+	"id" : {
+		"idFieldName":"id",
+		"getValue" : function(f){
+			var field = this["idFieldName"];
+			return f(field);
+		},
+	},
+	"title" : {
+		"titleFieldName":"Summary",
+		"getValue" : function(f){
+			var field = this["titleFieldName"];
+			return f(field);
+		},
+	},
+	"allDay" : {
+		"timeStartFieldName" : "TimeStart",
+		"getValue" : function(f){
+			var field = this["timeStartFieldName"];
+			if(f(field).length){//we have a start time so this is false
+				return false;
+			}
+			else{
+				return true;
+			}
+		},
+	},
+	"start" : {
+		"timeStartFieldName" : "TimeStart",
+		"dateStartFieldName" : "DateStart",
+		"getValue" : function(f){
+			var time = this["timeStartFieldName"];
+			var date = this["dateStartFieldName"];
+			var d = new Date( f(date) + " " + f(time));
+			return d.toISOString()
+		},
+	},
+	"end" : {
+		"timeEndFieldName" : "TimeEnd",
+		"dateEndFieldName" : "DateEnd",
+		"getValue" : function(f){
+			var time = this["timeEndFieldName"];
+			var date = this["dateEndFieldName"];
+			if(f(time).length){
+				var d = new Date(f(date) + " " + f(time));
+			}
+			else
+			{
+				var d = new Date(f(date));
+				d.setDate(d.getDate()+1);
+			}
+			return d.toISOString();
+		},
+	},
+	"description" : {
+		"descriptionFieldName":"Description",
+		"getValue" : function(f){
+			var field = this["descriptionFieldName"];
+			return f(field);
+		},
+	},
+	"resource" : {
+		"resourceFieldName":"Resource",
+		"getValue" : function(f){
+			var field = this["resourceFieldName"];
+			return f(field);
+		},
+	},
+	"status" : {
+		"statusFieldName":"Status",
+		"getValue" : function(f){
+			var field = this["statusFieldName"];
+			return f(field);
+		},
+	},
+	"contactId" : {
+		"contactIdFieldName":"id_contact",
+		"getValue" : function(f){
+			var field = this["contactIdFieldName"];
+			return f(field);
+		},
+	},
+	"contactId" : {
+		"contactIdFieldName":"id_contact",
+		"getValue" : function(f){
+			var field = this["contactIdFieldName"];
+			return f(field);
+		},
+	},
+	"fmRecordId" : {
+		"fmRecordIdFieldName":"-recid",
+		"getValue" : function(f){
+			var field = this["fmRecordIdFieldName"];
+			return f(field);
+		},
+	},
+	"fmModId" : {
+		"fmModIdFieldName":"-modid",
+		"getValue" : function(f){
+			var field = this["fmModIdFieldName"];
+			return f(field);
+		},
+	},
+
+	
 };
-fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);</code></pre>
+var query = fmxj.findRecordsURL("Events", "Events", requests);
+fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></pre>
 <button id="btn5">try example 5</button>
 <pre id="example5" class="result tall"></pre>
 
@@ -396,39 +464,111 @@ fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);</code></pre>
 		}
 		var start = new Date().getTime();
 		var fcObject = 	{
-			"id" : [function(f){return f(this[1])}, "id"],
-			"title" : [function(f){return f(this[1])}, "Summary"],
-			"allDay" : [function(f){ 
-						if(f(this[1]).length){
-							return false;
-						}
-						else{
-							return true;
-						}
-						}, "TimeStart"],
-			"start" :  [function(f){
-						var d = new Date( f(this[1]) + " " + f(this[2]));
-						return d.toISOString()
-						}, "DateStart", "TimeStart"],
-			"end" : [function(f){
-						if(f(this[2]).length){
-							var d = new Date(f(this[1]) + " " + f(this[2]));
-						}
-						else
-						{
-							var d = new Date(f(this[1]));
-							d.setDate(d.getDate()+1);
-						}
-						return d.toISOString()
-						}, "DateEnd", "TimeEnd"],
-			"description" : [function(f){return f(this[1])}, "Description"],
-			"resource" : [function(f){return f(this[1])}, "Resource"],
-			"status" : [function(f){return f(this[1])}, "Status"],
-			"contactid" : [function(f){return f(this[1])}, "id_contact"],
-			"fmRecordId" : [function(f){return f(this[1])}, "-recid"],
-			"fmModId" : [function(f){return f(this[1])}, "-modid"],
+		"id" : {
+			"idFieldName":"id",
+			"getValue" : function(f){
+				var field = this["idFieldName"];
+				return f(field);
+			},
+		},
+		"title" : {
+			"titleFieldName":"Summary",
+			"getValue" : function(f){
+				var field = this["titleFieldName"];
+				return f(field);
+			},
+		},
+		"allDay" : {
+			"timeStartFieldName" : "TimeStart",
+			"getValue" : function(f){
+				var field = this["timeStartFieldName"];
+				if(f(field).length){//we have a start time so this is false
+					return false;
+				}
+				else{
+					return true;
+				}
+			},
+		},
+		"start" : {
+			"timeStartFieldName" : "TimeStart",
+			"dateStartFieldName" : "DateStart",
+			"getValue" : function(f){
+				var time = this["timeStartFieldName"];
+				var date = this["dateStartFieldName"];
+				var d = new Date( f(date) + " " + f(time));
+				return d.toISOString()
+			},
+		},
+		"end" : {
+			"timeEndFieldName" : "TimeEnd",
+			"dateEndFieldName" : "DateEnd",
+			"getValue" : function(f){
+				var time = this["timeEndFieldName"];
+				var date = this["dateEndFieldName"];
+				if(f(time).length){
+					var d = new Date(f(date) + " " + f(time));
+				}
+				else
+				{
+					var d = new Date(f(date));
+					d.setDate(d.getDate()+1);
+				}
+				return d.toISOString();
+			},
+		},
+		"description" : {
+			"descriptionFieldName":"Description",
+			"getValue" : function(f){
+				var field = this["descriptionFieldName"];
+				return f(field);
+			},
+		},
+		"resource" : {
+			"resourceFieldName":"Resource",
+			"getValue" : function(f){
+				var field = this["resourceFieldName"];
+				return f(field);
+			},
+		},
+		"status" : {
+			"statusFieldName":"Status",
+			"getValue" : function(f){
+				var field = this["statusFieldName"];
+				return f(field);
+			},
+		},
+		"contactId" : {
+			"contactIdFieldName":"id_contact",
+			"getValue" : function(f){
+				var field = this["contactIdFieldName"];
+				return f(field);
+			},
+		},
+		"contactId" : {
+			"contactIdFieldName":"id_contact",
+			"getValue" : function(f){
+				var field = this["contactIdFieldName"];
+				return f(field);
+			},
+		},
+		"fmRecordId" : {
+			"fmRecordIdFieldName":"-recid",
+			"getValue" : function(f){
+				var field = this["fmRecordIdFieldName"];
+				return f(field);
+			},
+		},
+		"fmModId" : {
+			"fmModIdFieldName":"-modid",
+			"getValue" : function(f){
+				var field = this["fmModIdFieldName"];
+				return f(field);
+			},
+		},
+
+		
 		};
-		//var contactRequests = [{"Status":"Customer"}];
 		var query = fmxj.findRecordsURL("Events", "Events", requests);
 		updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
 		fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);
