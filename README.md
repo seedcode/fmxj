@@ -460,6 +460,28 @@ var query = fmxj.deleteRecordURL("Events" , "Events" , 6198);
 ...which can now be passed to *postQueryFMS()*.
 
 ***
+**layoutInfoURL(fileName, layoutName)**
+
+* **fileName:** string: The target FileMaker file
+* **layoutName:** string: The target FileMaker layout in the above refernced file
+
+This function will create a -findany query that we'll use to get a one record result, but just return the layout fields and their data types. We use -findany, because FMPXMLLAYOUT does not give us the actual field types, but just the field control style on the layout. The postQueryFMS() recognizes the -findany and uses that as a flag to return the fields/types instead of actual data.
+
+**-delete Example**
+
+```javascript
+//Get the list of fields and their types on the "Evemts" layout
+//build query from our recid, our file and layout name are "Events"
+var query = fmxj.deleteRecordURL("Events" , "Events");
+```
+
+**...returns:**
+
+-db=Events&-lay=Events&-findany
+
+...which can now be passed to *postQueryFMS()*.
+
+***
 ##Functions for working with JavaScript Objects
 Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and any kind of necessary scripting in JavaScript. 
 
