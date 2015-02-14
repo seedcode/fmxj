@@ -26,7 +26,9 @@ return {
 	findRecordsURL: findRecordsURL,
 	editRecordURL: editRecordURL,
 	deleteRecordURL: deleteRecordURL,
-	layoutInfoURL: layoutInfoURL,
+	fileNamesURL: fileNamesURL,
+	layoutNamesURL: layoutNamesURL,
+	layoutFieldsURL: layoutFieldsURL,
 	errorDescription: errorDescription,
 	filterObjects: filterObjects,
 	sortObjects: sortObjects,
@@ -244,7 +246,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 				var c = 0
 				for (c in cop){
 					//initialize our new object with these key names.;
-					thisRecord[cop[c]] = resultClass[cop[c]][0](valueByField);
+					thisRecord[cop[c]] = resultClass[cop[c]]["getValue"](valueByField);
 				};
 
 			}
@@ -502,9 +504,21 @@ function deleteRecordURL( fileName , layoutName , recid ){
 
 //creates a general -findany URL for postQueryFMS, but we'll just get the metadata
 //we use this instead of FMPXMLLAYOUT does not give us field data types!!!???
-function layoutInfoURL( fileName , layoutName ){
+function layoutFieldsURL( fileName , layoutName ){
 	var q = "&-findany"
 	return "-db=" + fileName + "&-lay=" + layoutName + q ;
+};
+
+//creates a general -layoutnames URL for postQueryFMS, returns the list as an object array
+function layoutNamesURL( fileName ){
+	var q = "&-layoutnames"
+	return "-db=" + fileName  + q ;
+};
+
+//creates a general -dbnames URL for postQueryFMS, returns the list as an object array
+function fileNamesURL(){
+	var q = "&-dbnames"
+	return  q ;
 };
 
 //Descriptions of FileMaker Error Codes

@@ -3,7 +3,7 @@
 <html>
 	
 <head>
-<title>fmxj.layoutInfo</title>
+<title>fmxj.layoutFields</title>
 
 <script src="../fmxj.js" type="text/javascript"></script> 
 <link rel="stylesheet" type="text/css" href="../css/fmxj.css">
@@ -36,7 +36,7 @@
 			</h3>
 		<p><div class="divSeparator"></div></p>
 		
-		<h3 class="functionTitle">layoutInfoURL(fileName, layoutName)</h3>
+		<h3 class="functionTitle">layoutFieldsURL(fileName, layoutName)</h3>
 		<div class="text">Create a FileMaker query to return an object with field names and data types.</div>
 	</br>
 		<div class="divSeparator"></div>
@@ -73,11 +73,11 @@
 		</div>
 <pre class="line-numbers">
 <code class="language-javascript">
-var query = fmxj.layoutInfoURL("Events", "Events");
+var query = fmxj.layoutFieldsURL("Events", "Events");
 fmxj.postQueryFMS(query, writeResult);//POST query</code></pre>
 
 <button id="btn1">try example 1</button>
-<pre id="example1" class="result" style="height:600px;max-height:none"></pre>
+<pre id="example1" class="result" style="height:387px;max-height:none"></pre>
 
 </div>
 
@@ -93,7 +93,8 @@ fmxj.postQueryFMS(query, writeResult);//POST query</code></pre>
 var btn = document.getElementById("btn1");
 btn.addEventListener("click",function(){
 start = new Date().getTime();
-var query = fmxj.layoutInfoURL("Events", "Events");
+var query = fmxj.layoutFieldsURL("Events", "Events");
+updateElement("example1","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
 fmxj.postQueryFMS(query, writeResult, null, relay);//POST query
 function writeResult (js,utc) { // define handler for results.
 		updateElement("example1", createDisplay(js, utc, start));
