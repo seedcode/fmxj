@@ -349,7 +349,7 @@ results in objects like this:
 ```
 
 ***
-##Query Building Functions
+##Data Functions
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
 
@@ -445,7 +445,7 @@ var query = fmxj.editRecordURL("Events", "Events", newRecord);
 
 This function will create a -delete query for a FileMaker record with the specified -recid property.
 
-**-delete Example**
+**Example**
 
 ```javascript
 //Delete the record with a -recid of 6198.
@@ -460,19 +460,66 @@ var query = fmxj.deleteRecordURL("Events" , "Events" , 6198);
 ...which can now be passed to *postQueryFMS()*.
 
 ***
-**layoutInfoURL(fileName, layoutName)**
+##Design Functions
+
+These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  These three are for getting facts about the files on the server. The layouts in a file, and the fields on a layout.
+
+***
+**fileNamesURL()**
+
+* **fileName:** string: The target FileMaker file
+* **layoutName:** string: The target FileMaker layout in the above refernced file
+
+This function will create a -dbnames query that we'll use to get a list of the available files on the server. Files will need to have at least one account with XML extended privileges to show up here. This query is slower than the rest.
+
+**Example**
+
+```javascript
+//Get the list of file names on the specified or host server
+var query = fmxj.fileNamesURL();
+```
+
+**...returns:**
+
+-dbnames
+
+...which can now be passed to *postQueryFMS()*.
+
+***
+**layoutNamesURL(fileName)**
+
+* **fileName:** string: The target FileMaker file
+
+This function will create a -layoutnames query that we'll use to get a list of layout names for the specified file.
+
+**Example**
+
+```javascript
+//Get the list of fields and their types on the "Evemts" layout
+//build query from our recid, our file and layout name are "Events"
+var query = fmxj.LayoutNamesURL("Events");
+```
+
+**...returns:**
+
+-db=Events&-layoutnames
+
+...which can now be passed to *postQueryFMS()*.
+
+***
+**layoutFieldsURL(fileName, layoutName)**
 
 * **fileName:** string: The target FileMaker file
 * **layoutName:** string: The target FileMaker layout in the above refernced file
 
 This function will create a -findany query that we'll use to get a one record result, but just return the layout fields and their data types. We use -findany, because FMPXMLLAYOUT does not give us the actual field types, but just the field control style on the layout. The postQueryFMS() recognizes the -findany and uses that as a flag to return the fields/types instead of actual data.
 
-**-delete Example**
+**Example**
 
 ```javascript
 //Get the list of fields and their types on the "Evemts" layout
 //build query from our recid, our file and layout name are "Events"
-var query = fmxj.deleteRecordURL("Events" , "Events");
+var query = fmxj.LayoutFieldsURL("Events" , "Events");
 ```
 
 **...returns:**
@@ -480,6 +527,7 @@ var query = fmxj.deleteRecordURL("Events" , "Events");
 -db=Events&-lay=Events&-findany
 
 ...which can now be passed to *postQueryFMS()*.
+
 
 ***
 ##Functions for working with JavaScript Objects
