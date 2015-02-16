@@ -458,7 +458,7 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 		} ;
 		//callback for writing results to pre
 		var writeResults = function(js,utc){
-			var message = createDisplay(js, utc, start, js.length);
+			var message = createDisplay(js, utc, start, 500);
 			updateElement("example5",message);
 		}
 		var start = new Date().getTime();

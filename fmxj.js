@@ -128,187 +128,14 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 function convertXml2Js( xml , requestType , resultClass ){
 		
 		//rather than parsing errors.
-		if(!xml){return""};
-
-		var newObject = function (xmlRow , props , recid , modid) {
-			
-			var dataTag = "DATA";
-			var colTag = "COL";
-	
-			var thisRecord = {};
-	
-			var i = 0;
-			var p = 0;
-			var colCount = 0;
-			
-			var propArray = [];
-	
-			function fmRecordByIndex(i){
-				thisRecord["-recid"]=recid;
-				thisRecord["-modid"]=modid;
-				//simple factory for related records.
-				function newRelatedObject(){
-					var o = {};
-					return o;
-				};
-				var thisPropObj = "";
-				var thisProp = "";
-				var thisObj = "";
-				var column = "";
-				var data = "";
-				var val = "";
-				var c = 0;
-				var children = 0;
-				
-				thisPropObj = props["items"][i];
-				thisProp = thisPropObj["property"];
-				thisObj = thisPropObj["object"];
-				column = xmlRow.getElementsByTagName(colTag)[i];
-				if(thisObj){
-				//related column
-				//does this property exist already
-					thisObj= "-" + thisObj ;
-					children = column.childNodes.length;
-					if(!thisRecord[thisObj]&&children){
-						thisRecord[thisObj]=[];
-					}
-					else if(children==0){
-						thisRecord[thisObj]="";
-					}
-					while(c<children){
-						data = column.getElementsByTagName(dataTag)[c].childNodes[0];
-						if (data) { val = data.nodeValue } else {val = ""};
-						//does this object exist already
-						if(!thisRecord[thisObj][c]){
-							thisRecord[thisObj][c] = newRelatedObject();
-						};
-						thisRecord[thisObj][c][thisProp]=val;	
-						c++
-					};
-									
-				}
-				else{
-				//local column
-					data = column.getElementsByTagName(dataTag)[0].childNodes[0];
-					if (data) { val = data.nodeValue } else {val = ""};
-					thisRecord[thisProp]=val;
-				}
-			};
-			
-			function valueByField(fieldName){
-				if (fieldName==="-recid"){return recid};
-				if (fieldName==="-modid"){return modid};
-				function valueByIndex(i){
-					var thisPropObj = "";
-					var thisProp = "";
-					var thisObj = "";
-					var column = "";
-					var data = "";
-					var val = "";
-					var c = 0;
-					var children = 0;
-					thisPropObj = props["items"][i];
-					if(!thisPropObj){return ""};
-					thisProp = thisPropObj["property"];
-					thisObj = thisPropObj["object"];
-					column = xmlRow.getElementsByTagName(colTag)[i];
-					if(thisObj){
-					//related column
-					//does this property exist already
-						thisObj= "-" + thisObj ;
-						children = column.childNodes.length;
-						thisObj=[];
-	
-						while(c<children){
-							data = column.getElementsByTagName(dataTag)[c].childNodes[0];
-							if (data) { val = data.nodeValue } else {val = ""};
-							thisObj[c][thisProp]=val;	
-							c++
-						};
-						return thisObj;				
-					}
-					else{
-					//local column
-						data = column.getElementsByTagName(dataTag)[0].childNodes[0];
-						if (data) { val = data.nodeValue } else {val = ""};
-						return val;
-					}
-				};
-				var ind = props["index"][fieldName];
-				return valueByIndex(ind);
-			}
-			
-			//console.log(customObject);
-			
-			colCount = xmlRow.childNodes.length;
-			if(resultClass){
-				var cop = Object.getOwnPropertyNames(resultClass);
-				var c = 0
-				for (c in cop){
-					//initialize our new object with these key names.;
-					thisRecord[cop[c]] = resultClass[cop[c]]["getValue"](valueByField);
-				};
-
-			}
-			else{
-			while(i<colCount){
-				fmRecordByIndex(i);
-			i++;
-			}
-			};
-			return(thisRecord);
-		};
-				
-		//object for defining layout, i.e. related fields will be put into sub-array.
-		var layoutModel = function ( FMXMLMetaData ){
-			
-			//factory for object describing the field.
-			var newFieldObject = function(prop,obj){
-				var o = {};
-				o["property"]=prop;
-				o["object"]=obj;
-				return o;
-			};
-			
-			var resultObj = {};
-			var index = {};
-			var model = {};
-			var nameTag = "NAME";
-			var typeTag = "TYPE";
-			var fieldCount = FMXMLMetaData.childNodes.length ;
-			var result = [];
-			var i = 0 ;
-			var field = "";
-			var type = "";
-			while ( i < fieldCount ){
-				field = FMXMLMetaData.childNodes[i].getAttribute(nameTag);
-				type = FMXMLMetaData.childNodes[i].getAttribute(typeTag);
-				//related field
-				if(field.indexOf("::")>0){
-					var p = field.indexOf("::");
-					var t = field.substring(0,p);
-					var f = field.substring(p+2);
-					var fieldObject = newFieldObject(f,t);
-					model[field] = type;
-				}
-				//local field
-				else
-				{
-					model[field] = type;
-					var fieldObject = newFieldObject(field,null);
-				}
-				index[field] = i;
-				result.push(fieldObject);
-				i++;
-			}
-			resultObj["index"] = index;
-			resultObj["items"] = result;
-			resultObj["model"] = model;
-			
-			return resultObj ;
+		if(!xml){return
+			[{"ERRORCODE" : "-1","DESCRIPTION" : "No XML Results from the FileMaker Server"}]
 		};
 		
-
+		var c = 0;
+		var v = 0;
+		var dataTag = "DATA";
+		var colTag = "COL";
 		var resultTag = "RESULTSET" ;
 		var errorCodeTag = "ERRORCODE" ;
 		var description = "DESCRIPTION"
@@ -319,24 +146,195 @@ function convertXml2Js( xml , requestType , resultClass ){
 		var modid = "MODID";
 		var id = "";
 		var mid = "";
-
+		var row = "";
 		var result = [];
-		var row = {};
-		var c = 0 ;
+		var obj = {};
+		var newArray = [];
 		
+		//function for generating layout/field info from the METADATA Node
+		//returns an object with two objects and an array: 
+		//model{}: fieldnames reference index position 
+		//fields{}: fieldnames reference data type
+		//index[]: fieldnames (no TO:: pre-fix) in their index position
+		function layoutModel ( FMXMLMetaData ){
+			
+			var index = [];
+			var result = {}
+			var fields = {};		
+			var model = {};
+			var nameTag = "NAME";
+			var typeTag = "TYPE";
+			var field = "";
+			var type = "";
+			
+			var fieldCount = FMXMLMetaData.childNodes.length ;
+			var i = 0;
+			
+			while(i<fieldCount){
+				field = FMXMLMetaData.childNodes[i].getAttribute(nameTag);
+				type = FMXMLMetaData.childNodes[i].getAttribute(typeTag);
+				//related field
+				if(field.indexOf("::")>0){
+					var pos = field.indexOf("::");
+					var t = field.substring(0,pos);
+					var f = field.substring(pos+2);
+					t = "-" + t; //add hyphen prefix to keep from coliding with parent fields
+					//does this proprty t exist in our model
+					if(!model[t]){model[t]=[]};
+					model[t].push(i);
+					index[i]=f;					
+				}
+				//local field
+				else
+				{
+					model[field] = [i];
+					index[i]=field;
+				}
+				fields[field]=type;
+			i++;
+			};
+			result["model"]=model;
+			result["fields"]=fields;
+			result["index"]=index;
+			return result;
+		};
+		
+		//retrieve value from the current XML DATA node by field name
+		//returns an array as there can be 1...n values
+		function valueByField(field){
+			//can return a string or an array.
+			if(field==="-recid"){return id};
+			if(field==="-modid"){return mid};
+			var a = fieldObjects["model"][field];
+			if(a.length>1){ //fields in a portal
+				var i = 0;
+				var result = [];
+				for (i in a){
+					result.push(valueByIndex(a[i]))
+				};
+				return result;
+			}
+			else{	
+				return valueByIndex(a[0]);
+			}
+		};
+		
+		//retrieve value from the current XML DATA node by field name
+		//returns a string if there is just one value.
+		function valueByFieldString(field){
+			//can return a string or an array.
+			if(field==="-recid"){return id};
+			if(field==="-modid"){return mid};
+			var a = fieldObjects["model"][field];
+			if(a.length>1){ //fields in a portal
+				var i = 0;
+				var result = [];
+				for (i in a){
+					result.push(valueByIndex(a[i]))
+				};
+				return result;
+			}
+			else{	
+				return valueByIndex(a[0])[0];
+			}
+		};
+		
+		//retrieve value from the current XML DATA node by field index
+		function valueByIndex(i){
+			//Just get the values by index
+			//return as an array as we may have multiples.
+			var column = row.getElementsByTagName(colTag)[i];
+			var children = column.childNodes.length;
+			var c = 0;
+			var data = "";
+			var val = "";
+			var result = [];
+			while (c<children){
+				data = column.getElementsByTagName(dataTag)[c].childNodes[0];
+				if(data){val=data.nodeValue} else {val=""};
+				result.push(val);
+			c++;
+			};
+			return result;
+		};
+		
+		//turns arrays/columns into javascript objects. arrays come from layout portals
+		//index is an array of field names to use for the nested object prop names
+		//arrays is an array of the arrays of valuesreturned valuesByField
+		function arraysToObjects(index, arrays){
+			var result = [];
+			var aLgth = arrays[0].length;
+			var iLgth = index.length;
+			var i = 0;
+			var a = 0;
+			while (a<aLgth){
+				result[a]={};
+				for (i in index){
+					result[a][index[i]] = arrays[i][a];
+				}
+				a++;
+			};	
+			return result;
+		};
+		
+		//creates the new Objects for results.
+		//custom is an object that maps our FileMaker fields to a new object.
+		//see demo page postQueryFMS() example 5 for custom example
+		function newObject(custom){
+			var thisObject = {};
+			var c = 0;
+			var i = 0;
+			var val = "";
+
+			if(custom){
+				var props = Object.getOwnPropertyNames(custom);
+				for (c in props){
+					thisObject[props[c]] = custom[props[c]]["getValue"](valueByFieldString);
+				};
+			}
+			else {
+				thisObject["-recid"]=id;
+				thisObject["-modid"]=mid;
+				var arrays = [];
+				var index = [];
+				var fields = [];
+				var props = Object.getOwnPropertyNames(fieldObjects["model"]);
+				for (c in props){
+					val = valueByField(props[c]);
+					if (val.length===1){
+					thisObject[props[c]] = val[0];
+					}
+					else{
+						index = fieldObjects["model"][props[c]]; //index of fields from the model
+						for (i in index){  //get the field name from the index array
+							fields.push(fieldObjects["index"][index[i]]); //fieldnames
+							arrays.push(val[i]); //array of arrays
+						};
+					thisObject[props[c]] = arraysToObjects(fields, arrays);
+					};
+				};
+			};
+			return thisObject;
+		};
+		
+		//define layout model
+		var mData = xml.getElementsByTagName(metadataTag)[0];
+		var fieldObjects = layoutModel(mData);
+		console.log(fieldObjects);
+		
+		//we handle the results format a little differently for these queries so flag them,
 		var isDeleteRequest = false;
 		if (requestType==="-delete"){
 			var isDeleteRequest = true;
 		};
-		
 		var isFindAnyRequest = false;
 		if (requestType==="-findany"){
 			var isFindAnyRequest = true;
 		};
-		
-		
+			
 		//error check return error code object if not 0 OR delete request.
 		var error = xml.getElementsByTagName(errorCodeTag)[0].childNodes[0].nodeValue;
+		
 		if ( error!=0 || isDeleteRequest ) {
 			// exit with errcode object
 			var desc = errorDescription(error);
@@ -348,13 +346,9 @@ function convertXml2Js( xml , requestType , resultClass ){
 			return errorJs;
 		}
 		
-		//define layout model
-		var mData = xml.getElementsByTagName(metadataTag)[0];
-		var fieldObjects = layoutModel(mData);
-		
 		//altrnate formatting depending on request
 		if(isFindAnyRequest){// return as object with two contained objects {model,result}
-			result = [fieldObjects.model];
+			result = [fieldObjects.fields];
 			return result;
 		}
 		else{
@@ -364,10 +358,10 @@ function convertXml2Js( xml , requestType , resultClass ){
 				row = xml.getElementsByTagName(recordTag)[c];
 				id = xml.getElementsByTagName(recordTag)[c].getAttribute(recid);
 				mid = xml.getElementsByTagName(recordTag)[c].getAttribute(modid);
-				result.push ( newObject ( row , fieldObjects , id , mid ) ) ;
+				result.push(newObject(resultClass));
 				c++;	
 			};
-			return result ;
+			return result;
 		};
 
 };
