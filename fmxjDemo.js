@@ -16,68 +16,6 @@ var relay = {"php":"fmxjRelay.php","server":"sc-fms13-fms.fmsdb.com","protocol":
 
 //***************FUNCTIONS*********************
 
-function updateJSONLoop(resultElementID, requests, increment, sort){
-	var sourceLoop = [];
-	var max = increment;
-	var skip = 0;
-	var num = 0;
-	var total = 0;
-	var message = "";
-	var indent = 4; //JSON indent
-	var q = "";
-	var start = new Date().getTime();
-	var split = new Date().getTime();
-	//callback functions for writing download.
-	function writeDownload(n){
-		document.getElementById(resultElementID).innerHTML += "<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
-	} ;
-	function writeResult(js,utc){
-		var dlc = utc-split
-		split = new Date().getTime();
-		ms = split - start;
-		var cc = split-utc;
-		sourceLoop = sourceLoop.concat(js);
-		total = sourceLoop.length;
-		num = js.length;
-		if (num===max) { 
-			//maximum records returned, which meanse we have more to get(probably)
-			//increment skip and run again
-			skip = skip + max;
-			var q = fmxj.findRecordsURL("Events","Events", requests, sort, max, skip);
-			fmxj.postQueryFMS(q,writeResult,null,relay) ;
-		};
-				
-		//first time through we write our results
-		if (total===max) {
-			var displayJSON = JSON.stringify(sourceLoop.slice(0,max), null, indent );
-			message = "<span class=\"resultHeader\">" + num + " FileMaker records downloaded in " + 
-			dlc + " milliseconds.</span>\n" + "<span class=\"resultHeader\">converted to JS objects in " + 
-			cc + " milliseconds.</span>\n" + "<span class=\"resultHeader\">Displaying the first " + max + 
-			" \"stringified\" objects in " + (split-start) + " total milliseconds.</span>\n"
-			document.getElementById(resultElementID).innerHTML = message + "\n\n" + displayJSON ;
-		}
-		else if (num!==max) { //write final result
-			var displayJSON = JSON.stringify(sourceLoop.slice(0,max), null, indent );
-			message += "<span class=\"resultHeader\">" + num + " records downloaded in " + 
-			dlc + " milliseconds.</span>\n" + "<span class=\"resultHeader\">converted to JS objects in " + 
-			cc + " milliseconds.</span>\n";
-			document.getElementById(resultElementID).innerHTML = message + "<span class=\"resultHeader\">Complete! " +
-			total + " total records in " + (split-start) + " total milliseconds.</span>\n\n" + displayJSON ;
-		}
-		else { //update progress message
-			var displayJSON = JSON.stringify(sourceLoop.slice(0,max), null, indent );
-			message += "<span class=\"resultHeader\">" + num + " more records downloaded in " + 
-			dlc + " milliseconds.</span>\n" + "<span class=\"resultHeader\">converted to JS objects in " + 
-			cc + " milliseconds.</span>\n";
-			document.getElementById(resultElementID).innerHTML = message + "\n\n" + displayJSON ;
-		}
-	}; //end writeResult
-	var q = fmxj.findRecordsURL("Events","Events", requests , sort , max , skip  );
-	//clear values
-	document.getElementById(resultElementID).innerHTML = "<span class=\"resultHeader\">POST: " + q + "</span>\n\n";
-	fmxj.postQueryFMS(q, writeResult, writeDownload, relay);
-};
-
 function createMessage(js, utc, start, num){
 	var end = new Date().getTime();
 	var dlc = utc - start;
@@ -92,6 +30,23 @@ function createMessage(js, utc, start, num){
 	"FMPXMLRESULT converted to JS objects in " + cc + " milliseconds</span>\n" +
 	"<span class=\"resultHeader\">Displaying the first " + num + " \"stringified\" objects.</span>\n" +
 	"<span class=\"resultHeader\">" + (end - start) + " total milliseconds.</span>\n\n";
+	return message;
+	
+};
+
+function createMessageShort(js, utc, start, num){
+	var end = new Date().getTime();
+	var dlc = utc - start;
+	var cc = end - utc;
+	var tt = end - start;
+	var total = js.length;
+	if(!total){total = 1};
+	if(!num){var num= total};
+	var message = "<span class=\"resultHeader\">&#8226;" + total + 
+	" FileMaker records downloaded in " + dlc + " milliseconds</span>\n" +
+	"<span class=\"resultHeader\">" +  
+	"FMPXMLRESULT converted to JS objects in " + cc + " milliseconds</span>\n" +
+	"<span class=\"resultHeader\">Displaying the first " + num + " records as \"stringified\" objects.</span>\n"
 	return message;
 	
 };

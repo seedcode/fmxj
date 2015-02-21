@@ -20,13 +20,14 @@ POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP rel
 The **postQueryFMS()** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
-**postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, classResult])**
+**postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, classResult, max])**
 
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
 * **callBackOnDownload:** (optional) function: The handler function for the POST *e.loaded* progress reports.
 * **phpRelay:** (optional) object: specifies the server address and name of the php relay file being used.
 * **classResult:** (optional) object: defines "classes" the result objects rather then letting the FileMaker layout do this.
+* **max:** (optional) number: limts the number of results returned per "page." If not all query results are returned in a page then the function will POST for the next page recursively until all results are returned. This argument will override any max argument specified in the query object, but not the skip.
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
@@ -214,7 +215,7 @@ var relay = {"php":"fmxjRelay.php","server":"seedcode.com","protocol":"https","p
 
 **classResult Example**
 
-Specify an object "class" for the results using the below syntax and pass it as the resultClass argument.
+Specify an object "class" for the results using the below syntax and pass it as the resultClass argument. This example uses <a href="http://momentjs.com/" target="_blank">moment.js.</a> FileMaker Times are "floating" so we need to specify a time zone to solidify the events in the continuum.
 
 ```javascript
 var requests =	[
@@ -222,112 +223,129 @@ var requests =	[
 	{ "DateStart" : "2/1/2014...2/28/2014" }
 				] ;
 var query = fmxj.findRecordsURL("Events", "Events", requests);
+var query = fmxj.findRecordsURL("Events", "Events", requests);
 //define object class for the results and pass that as the class argument.
 var fcObject = 	{
 	"id" : {
-		"idFieldName":"id",
-		"getValue" : function(f){
-			var field = this["idFieldName"];
-			return f(field);
+			"idField":"id",
+			"getValue" : function(f){
+				var field = this["idField"];
+				return f(field);
+			},
 		},
-	},
 	"title" : {
-		"titleFieldName":"Summary",
-		"getValue" : function(f){
-			var field = this["titleFieldName"];
-			return f(field);
+			"titleField":"Summary",
+			"getValue" : function(f){
+				var field = this["titleField"];
+				return f(field);
+			},
 		},
-	},
 	"allDay" : {
-		"timeStartFieldName" : "TimeStart",
-		"getValue" : function(f){
-			var field = this["timeStartFieldName"];
-			if(f(field).length){//we have a start time so this is false
-				return false;
-			}
-			else{
-				return true;
-			}
+			"timeStartField" : "TimeStart",
+			"getValue" : function(f){
+				var field = this["timeStartField"];
+				if(f(field).length){//we have a start time so this is false
+					return false;
+				}
+				else{
+					return true;
+				}
+			},
 		},
-	},
 	"start" : {
-		"timeStartFieldName" : "TimeStart",
-		"dateStartFieldName" : "DateStart",
+		"timeStartField" : "TimeStart",
+		"dateStartField" : "DateStart",
+		"yearFormat" : "MM-DD-YYYY",
+		"timeFormat" : "HH:mm",
+		"timezone" : "America/Los_Angeles",
 		"getValue" : function(f){
-			var time = this["timeStartFieldName"];
-			var date = this["dateStartFieldName"];
-			var d = new Date( f(date) + " " + f(time));
-			return d.toISOString()
+			var time = this["timeStartField"];
+			var date = this["dateStartField"];
+			var zone = this["timezone"];
+			var yearFormat = this["yearFormat"];
+			var timeFormat = this["timeFormat"];
+			var date = moment( f(date) + " " + f(time) , yearFormat + " " + timeFormat );
+			return date.tz(zone).format();
 		},
 	},
 	"end" : {
-		"timeEndFieldName" : "TimeEnd",
-		"dateEndFieldName" : "DateEnd",
+		"timeEndField" : "TimeEnd",
+		"dateEndField" : "DateEnd",
+		"dateStartField" : "DateStart", //if no end date is specified we'll need to use the start date.
+		"yearFormat" : "MM-DD-YYYY",
+		"timeFormat" : "HH:mm",
+		"timezone" : "America/Los_Angeles",
 		"getValue" : function(f){
-			var time = this["timeEndFieldName"];
-			var date = this["dateEndFieldName"];
+			var time = this["timeEndField"];
+			var date = this["dateEndField"];
+			var sdate = this["dateStartField"];
+			var zone = this["timezone"];
+			var yearFormat = this["yearFormat"];
+			var timeFormat = this["timeFormat"];
+			//use start date if no end date
+			if(!f(date)){ var d = f(sdate) } else { var d = f(date)};
 			if(f(time).length){
-				var d = new Date(f(date) + " " + f(time));
+				d = moment( d + " " + f(time) , yearFormat + " " + timeFormat );
 			}
 			else
 			{
-				var d = new Date(f(date));
-				d.setDate(d.getDate()+1);
-			}
-			return d.toISOString();
+				d = moment( d , yearFormat + " " + timeFormat ).add( 1, "days");
+			};
+			return d.tz(zone).format();
 		},
 	},
 	"description" : {
-		"descriptionFieldName":"Description",
-		"getValue" : function(f){
-			var field = this["descriptionFieldName"];
-			return f(field);
+			"descriptionField":"Description",
+			"getValue" : function(f){
+				var field = this["descriptionField"];
+				return f(field);
+			},
 		},
-	},
 	"resource" : {
-		"resourceFieldName":"Resource",
-		"getValue" : function(f){
-			var field = this["resourceFieldName"];
-			return f(field);
+			"resourceField":"Resource",
+			"getValue" : function(f){
+				var field = this["resourceField"];
+				return f(field);
+			},
 		},
-	},
 	"status" : {
-		"statusFieldName":"Status",
-		"getValue" : function(f){
-			var field = this["statusFieldName"];
-			return f(field);
+			"statusField":"Status",
+			"getValue" : function(f){
+				var field = this["statusField"];
+				return f(field);
+			},
 		},
-	},
 	"contactId" : {
-		"contactIdFieldName":"id_contact",
-		"getValue" : function(f){
-			var field = this["contactIdFieldName"];
-			return f(field);
+			"contactIdFieldName":"id_contact",
+			"getValue" : function(f){
+				var field = this["contactIdFieldName"];
+				return f(field);
+			},
 		},
-	},
-	"contactId" : {
-		"contactIdFieldName":"id_contact",
-		"getValue" : function(f){
-			var field = this["contactIdFieldName"];
-			return f(field);
+	"projectId" : {
+			"projectIdField":"id_project",
+			"getValue" : function(f){
+				var field = this["projectIdField"];
+				return f(field);
+			},
 		},
-	},
 	"fmRecordId" : {
-		"fmRecordIdFieldName":"-recid",
-		"getValue" : function(f){
-			var field = this["fmRecordIdFieldName"];
-			return f(field);
+			"fmRecordIdField":"-recid",
+			"getValue" : function(f){
+				var field = this["fmRecordIdField"];
+				return f(field);
+			},
 		},
-	},
 	"fmModId" : {
-		"fmModIdFieldName":"-modid",
-		"getValue" : function(f){
-			var field = this["fmModIdFieldName"];
-			return f(field);
+			"fmModIdField":"-modid",
+			"getValue" : function(f){
+				var field = this["fmModIdField"];
+				return f(field);
+			},
 		},
-	},
-};
-fmxj.postQueryFMS(query, onReady, onProgress, relay, fcObject);
+	};
+//make call with our custom object definition
+fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);
 ```
 
 results in objects like this:
@@ -337,12 +355,13 @@ results in objects like this:
 	"id": "7A2E442C-3782-497F-A539-4495F1B28806",
 	"title": "Begin Production",
 	"allDay": true,
-	"start": "2014-02-09T07:00:00.000Z",
-	"end": "2014-02-10T07:00:00.000Z",
+	"start": "2014-02-08T23:00:00-08:00",
+	"end": "2014-02-09T23:00:00-08:00",
 	"description": "",
 	"resource": "Example A",
 	"status": "Open",
-	"contactid": "ED3C1292-EBC2-4027-82D2-33ADFB590A1D",
+	"contactId": "ED3C1292-EBC2-4027-82D2-33ADFB590A1D",
+	"projectId": "P00031",
 	"fmRecordId": "6198",
 	"fmModId": "178"
 }

@@ -33,17 +33,22 @@ return {
 	filterObjects: filterObjects,
 	sortObjects: sortObjects,
 	nestObjects: nestObjects,
-
 }
 
 //**********FileMaker Server Functions
+
+
+
+
 
 
 //function does an httpXMLRequest to the server and returns the results in JSON
 //Optional PHP Proxy/Relay information can be passed via the phpRelay object.
 //user and pass are provided if you're running your own client side auth routine. (Sent via POST).
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
-function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass ) {
+//resultClass is object for defining result objects, specify new properties and map the source values.
+//max will paginate results and recursively return pages to the callBack until all results have been returned.
+function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass , max ) {
 	
 	//check what query type we are as we'll do custom results for some (delete findany)	
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
@@ -52,6 +57,67 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 	if (parm!=="-delete"&&parm!=="-findany"){
 		parm = null;
 	};
+	
+	function internalCallBack(js,utc){
+		var c = js.length;
+		if(c===max){//our page is full, so increment skip and send back
+			skip = skip + max;
+			query = updateParam(query,"-skip",skip);
+			// Make New Request
+			req();
+		};
+		callBackOnReady(js,utc);
+	};
+	
+	function req(){
+	
+	//define request.
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function(){
+	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
+	{
+		var utc = new Date().getTime();
+	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass);
+		xmlhttp = null;
+		if ( js ) { internalCallBack ( js , utc ) } ;
+	}
+	};
+	if(callBackOnDownload){
+		xmlhttp.onprogress = function(e){
+			//e.loaded is the only feedback we get from FMS, but still may be useful.
+			callBackOnDownload(e.loaded);
+		}
+	};
+	xmlhttp.open( "POST",  url , true ) ;
+	xmlhttp.send(query);
+	
+	};
+	
+	//function for upgating max and skip in query
+	if (max){
+		//does the query argument already have a max?
+		var m = query.indexOf("-max=");
+		if(m==true){
+			query = updateParam(query,"-max",max) //if there's a max parm specified already, we override it.
+		}
+		else{
+			query = query.substring(0,li) + "-max=" + max + "&" + query.substring(li,query.length);
+		};
+		//does the query argument already have a skip?
+		var s = query.indexOf("-skip=");
+		if(s==true){
+			var se = query.indexOf("&",s);
+			var skip = query.substring(s+5,se);
+		}
+		else{
+			li = query.lastIndexOf("-");
+			var skip = 0;
+			query = query.substring(0,li) + "-skip=" + skip + "&" + query.substring(li,query.length);
+		};
+	};
+	
+
+	
 	
 	//if a proxy object is specified, then we'll send our POST to fmxjRelay.PHP page, so update query value.  
 	//Otherwise we're posting locally right to FMS via XML.
@@ -100,31 +166,13 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 		url = "/fmi/xml/FMPXMLRESULT.xml";
 	};
 	
-	//define request.
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.onreadystatechange = function(){
-	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
-	{
-		var utc = new Date().getTime();
-	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass);
-		xmlhttp = null;
-		if ( callBackOnReady && js ) { callBackOnReady ( js , utc ) } ;
-	}
-	};
-	if(callBackOnDownload){
-		xmlhttp.onprogress = function(e){
-			//e.loaded is the only feedback we get from FMS, but still may be useful.
-			callBackOnDownload(e.loaded);
-		}
-	};
-	xmlhttp.open( "POST",  url , true ) ;
-	xmlhttp.send(query);
+	req();
 	
 };
 
 //parses a FMPXMLRESULT into JSON adding -recid and -modid properties.
 //FMPXMLRESULT is 50-60% the size of fmresultset, so that's what we're using.
-//function for converting xml onready in queryFMS but could have uses outside of there.
+//function for converting xml onready in queryFMS but could have uses outside of there, so leaving Public
 function convertXml2Js( xml , requestType , resultClass ){
 		
 		//rather than parsing errors.
@@ -320,7 +368,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 		//define layout model
 		var mData = xml.getElementsByTagName(metadataTag)[0];
 		var fieldObjects = layoutModel(mData);
-		console.log(fieldObjects);
+		//console.log(fieldObjects);
 		
 		//we handle the results format a little differently for these queries so flag them,
 		var isDeleteRequest = false;
@@ -511,7 +559,7 @@ function layoutNamesURL( fileName ){
 
 //creates a general -dbnames URL for postQueryFMS, returns the list as an object array
 function fileNamesURL(){
-	var q = "&-dbnames"
+	var q = "-dbnames"
 	return  q ;
 };
 
@@ -949,6 +997,19 @@ function nestObjects( parentArray, childArray, childName, predicates) {
 	childArray=null;
 };
 
+
+//**********Private Functions
+
+//updates a parameter value in url query and returns new query string
+function updateParam(query, param, value){
+	var pl = param.length;
+	var ql = query.length;
+	var pp = query.lastIndexOf(param);
+	if(!pp){return} //can only update existing params
+	var pe = query.indexOf("&",pp);
+	var q = query.substring( 0, Number(pp) + Number(pl) + 1 ) + value + query.substring(pe,ql);
+	return q;
+};
 
 
 

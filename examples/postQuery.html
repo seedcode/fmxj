@@ -8,6 +8,8 @@
 <script src="../fmxj.js" type="text/javascript"></script> 
 <link rel="stylesheet" type="text/css" href="../css/fmxj.css">
 <script src="../libraries/prism.js" type="text/javascript"></script> 
+<script src="../libraries/moment.js" type="text/javascript"></script> 
+<script src="../libraries/moment-timezone.js" type="text/javascript"></script> 
 <link rel="stylesheet" type="text/css" href="../libraries/prism.css">
 <link rel="shortcut icon" href="http://www.seedcode.com/wp-content/uploads/2012/10/favicon.gif" type="image/x-icon">
 
@@ -36,8 +38,8 @@
 		<p><div class="divSeparator"></div></p>
 		
 
-		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, resultClass])</h3>
-		<div class="text">Performs an Ajax call to FileMaker Server. Results are converted to an Array of Objects(JSON) and passed to the callBackOnReady handler function. Query arguments can created from JavaScript Objects using the Query Functions. All fields on the target layout will be returned as object properties. Properties for -recid and -modid will be added automatically to each object in the array. Rather then letting the target FileMaker layout define the object, you can also define your own object (class) and map the FileMaker fields to your object's properties. Then pass this object as the resultClass argument.</div>
+		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, resultClass, max])</h3>
+		<div class="text">Performs an Ajax call to FileMaker Server. Results are converted to an Array of Objects(JSON) and passed to the callBackOnReady handler function. Query arguments can be created from JavaScript Objects using the Query Functions. All fields on the target layout will be returned as object properties (unless a resultClass argument is passed). Properties for -recid and -modid will be added automatically to each object in the array. Portals will be returned as a nested array of objects with the related table occuremce name as the property name, prefixed with a hyphen. You can also define your own object (class) and map the FileMaker fields to your object's properties. Then pass this object as the resultClass argument(see example 5).</div>
 	</br>
 		<div class="divSeparator"></div>
 		<div class="argument">
@@ -134,15 +136,53 @@
 		<span class="type func">
 			Object
 		</span>	
-		<div class="desc">
-			(Optional) Rather then letting the specified FileMaker layout object define your JavaScript Object, you can define an object/class and map the FileMaker values to it. This can be helpful for adapting your data to a library looking for a specific "class" of object. FileMaker values can be referenced using this syntax, where the function f will retrieve the specified field value at object creation: <pre><code class="language-javascript">
+		<div class="desc" style="max-height:none">
+			(Optional) Rather then letting the specified FileMaker layout object define your JavaScript Object, you can define an object/class and map the FileMaker values to it. This can be helpful for adapting your data to a library looking for a specific "class" of object. FileMaker values can be referenced using this syntax, where the function f will retrieve the specified field value at object creation. The method must be named getValue: <pre><code class="language-javascript">
 { 
-	"&lt;newobjectproperty&gt;" : [function(f){return f(this[1]),"&lt;filemakerfieldname&gt;"],
+	"id" : {
+		"idFieldName":"id", // filemaker field name is "id" 
+		"getValue" : function(f){ // method name must be getValue.
+			var field = this["idFieldName"]; //retrieve our field name
+			return f(field); //retrieve the filemaker field value
+		}, // end method
+	}, // end property
 }</code></pre>
-See example 5 below for more details on this argument usage.
+
+In addition to straight field mapping, you can also define the <span class="func">getValue()</span> method to transform/combine the source data.<pre><code class="language-javascript">
+{
+	"allDay" : {
+		"timeStartFieldName" : "TimeStart", //field for start time, 
+		"getValue" : function(f){
+			var field = this["timeStartFieldName"];
+			if(f(field).length){  //we have a start time so this is false
+				return false;
+			}
+			else{  //if empty, event is all day
+				return true;
+			};
+		}, // end getValue method
+	}, // end property
+}</code></pre>
+
+		See example 5 below for more details on this argument usage.
 		</div>
 		
 		<div class="divSeparator"></div>
+		<div class="argument">
+			max
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type number">
+			Number
+		</span>	
+		<div class="desc">
+			(Optional) Passing a number to this argument will limut the number if results returned per "page." If not all query results are returned in a page then the function will POST for the next page recursively until all results are returned. 250 to 500 records seems to be ideal for FMS. See example 2.
+</div>
+		
+		
+<div class="divSeparator"></div>
 		
 		
 
@@ -173,57 +213,31 @@ fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction); //make call</code
 </br>
 <div class="divSeparator"></div>
 <div class="argument">example 2</div>
-<div class="text">Looping Ajax Calls. Use Max and Skip in the <span class="func">findRecordsURL()</span> to increment your calls. Takes a little longer overall, but initial results are displayed much more quickly.</div>
+<div class="text">Looping Ajax Calls. Specify a max argument to limit the results per page. The function will recursively return the next page of results, and call the onReadyfunction until all records found in the query are returned.</div>
 
 <pre class="line-numbers pad shadow" style="max-height:none">
 <code class="language-javascript">
-//sample function for updating pre via loop
-function updateJSONLoop(resultElementID, requests, increment, sort){
-	var sourceLoop = [];
-	var max = increment;
-	var skip = 0;
-	var num = 0;
-	var total = 0;
-	var message = "";
-	var indent = 4; //JSON indent
-	var q = "";
-	//callback functions for writing download.
-	function writeDownload(n){
-		document.getElementById(resultElementID).innerHTML += 
-		"<span class=\"resultHeader\">" + n + " bytes downloaded</span>\n" ;
-	} ;
-	function writeResult(js){
-		sourceLoop = sourceLoop.concat(js);
-		total = sourceLoop.length;
-		num = js.length;
-		if (num===max) { 
-			//maximum records returned, which meanse we have more to get(probably)
-			//increment skip and run again
-			skip = skip + max;
-			var q = fmxj.findRecordsURL("Events","Events", requests, sort, max, skip);
-			fmxj.postQueryFMS(q,writeResult,null,relay) ;
-		};
-		//Write results to element, first, last and middle ara little different.
-		//displaying collapsed, see fmxjDemo.js for full function code.
-		if (total===max) {*}
-		else if (num!==max) {*}
-		else {*}
-	}; //end writeResult
-	var q = fmxj.findRecordsURL("Events","Events", requests , sort , max , skip  );
-	fmxj.postQueryFMS(q, writeResult, writeDownload, relay);
-};
-var requests =	[
-	{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
+var sourceLoop = [];
+var requests =	[ //create requests for query
+	{ "DateStart" : "&lt;=2/28/2014" , "DateEnd" : ">=2/1/2014" },
 	{ "DateStart" : "2/1/2014...2/28/2014" }
-				] ;
+				];
 var sortObject = { 
 	"field1" : "DateStart" ,
-	"sort1" : "ascend" 
+	"order1" : "ascend" ,
 				 } ;
-updateJSONLoop("loopResult", requests, 500, sortObject); //loads 500 records at a time</code></pre>
+var query = fmxj.findRecordsURL("Events", "Events", requests) ; // create query
+function onReadyFuntion(js){ //define handler for onready
+	//callBack will return pages recursively, so concat to our array.
+	sourceLoop = sourceLoop.concat(js);
+	document.getElementById("example1") = JSON.stringify(sourceLoop, null, 4);
+};
+// for 375 results per page (max) we don't need an onProgress handler, so we'll set to null.
+fmxj.postQueryFMS(query, onReadyFunction, null, relay, null, 375); //make call</code></pre>
+
 
 <button id="btn2">try example 2</button>
-<pre id="example2" class="result tall"></pre>
+<pre id="example2" class="result tall" style="height:600px;max-height:600px"></pre>
 </br>
 <div class="divSeparator"></div>
 <div class="argument">example 3</div>
@@ -249,29 +263,29 @@ fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
 <div class="divSeparator"></div>
 <div class="argument">example 5</div>
 <div class="text">
-	Specify an object "class" for the objects rather than using the FileMaker layout and field names to define them. This can be used for straight field mapping, but also for transformation. The property name of the object will be the new object property name. The property value is an object specifying the FileMaker fields to be used and a method <span class="func">getValue</span> to specify how the values should be returned. Please use the below syntax for the <span class="func">getValue</span> method.
+	Specify an object "class" for the objects rather than using the FileMaker layout and field names to define them. This can be used for straight field mapping, but also for transformation. The property name of the object will be the new object property name. The property value is an object specifying the FileMaker fields to be used and a method <span class="func">getValue</span> to specify how the values should be returned. Please use the below syntax for the <span class="func">getValue</span> method. This example uses <a href="http://momentjs.com/" target="_blank">moment.js.</a> FileMaker Times are "floating" so we need to specify a time zone to solidify the events in the continuum.
 </div>
 <pre class="line-numbers" style="max-height:none">
 <code class="language-javascript">
 var fcObject = 	{
 	"id" : {
-			"idFieldName":"id",
+			"idField":"id",
 			"getValue" : function(f){
-				var field = this["idFieldName"];
+				var field = this["idField"];
 				return f(field);
 			},
 		},
 	"title" : {
-			"titleFieldName":"Summary",
+			"titleField":"Summary",
 			"getValue" : function(f){
-				var field = this["titleFieldName"];
+				var field = this["titleField"];
 				return f(field);
 			},
 		},
 	"allDay" : {
-			"timeStartFieldName" : "TimeStart",
+			"timeStartField" : "TimeStart",
 			"getValue" : function(f){
-				var field = this["timeStartFieldName"];
+				var field = this["timeStartField"];
 				if(f(field).length){//we have a start time so this is false
 					return false;
 				}
@@ -281,50 +295,65 @@ var fcObject = 	{
 			},
 		},
 	"start" : {
-			"timeStartFieldName" : "TimeStart",
-			"dateStartFieldName" : "DateStart",
-			"getValue" : function(f){
-				var time = this["timeStartFieldName"];
-				var date = this["dateStartFieldName"];
-				var d = new Date( f(date) + " " + f(time));
-				return d.toISOString()
-			},
+		"timeStartField" : "TimeStart",
+		"dateStartField" : "DateStart",
+		"yearFormat" : "MM-DD-YYYY",
+		"timeFormat" : "HH:mm",
+		"timezone" : "America/Los_Angeles",
+		"getValue" : function(f){
+			var time = this["timeStartField"];
+			var date = this["dateStartField"];
+			var zone = this["timezone"];
+			var yearFormat = this["yearFormat"];
+			var timeFormat = this["timeFormat"];
+			var date = moment( f(date) + " " + f(time) , yearFormat + " " + timeFormat );
+			return date.tz(zone).format();
 		},
+	},
 	"end" : {
-			"timeEndFieldName" : "TimeEnd",
-			"dateEndFieldName" : "DateEnd",
-			"getValue" : function(f){
-				var time = this["timeEndFieldName"];
-				var date = this["dateEndFieldName"];
-				if(f(time).length){
-					var d = new Date(f(date) + " " + f(time));
-				}
-				else
-				{
-					var d = new Date(f(date));
-					d.setDate(d.getDate()+1);
-				}
-				return d.toISOString();
-			},
+		"timeEndField" : "TimeEnd",
+		"dateEndField" : "DateEnd",
+		"dateStartField" : "DateStart", //if no end date is specified we'll need to use the start date.
+		"yearFormat" : "MM-DD-YYYY",
+		"timeFormat" : "HH:mm",
+		"timezone" : "America/Los_Angeles",
+		"getValue" : function(f){
+			var time = this["timeEndField"];
+			var date = this["dateEndField"];
+			var sdate = this["dateStartField"];
+			var zone = this["timezone"];
+			var yearFormat = this["yearFormat"];
+			var timeFormat = this["timeFormat"];
+			//use start date if no end date
+			if(!f(date)){ var d = f(sdate) } else { var d = f(date)};
+			if(f(time).length){
+				d = moment( d + " " + f(time) , yearFormat + " " + timeFormat );
+			}
+			else
+			{
+				d = moment( d , yearFormat + " " + timeFormat ).add( 1, "days");
+			};
+			return d.tz(zone).format();
 		},
+	},
 	"description" : {
-			"descriptionFieldName":"Description",
+			"descriptionField":"Description",
 			"getValue" : function(f){
-				var field = this["descriptionFieldName"];
+				var field = this["descriptionField"];
 				return f(field);
 			},
 		},
 	"resource" : {
-			"resourceFieldName":"Resource",
+			"resourceField":"Resource",
 			"getValue" : function(f){
-				var field = this["resourceFieldName"];
+				var field = this["resourceField"];
 				return f(field);
 			},
 		},
 	"status" : {
-			"statusFieldName":"Status",
+			"statusField":"Status",
 			"getValue" : function(f){
-				var field = this["statusFieldName"];
+				var field = this["statusField"];
 				return f(field);
 			},
 		},
@@ -335,24 +364,24 @@ var fcObject = 	{
 				return f(field);
 			},
 		},
-	"contactId" : {
-			"contactIdFieldName":"id_contact",
+	"projectId" : {
+			"projectIdField":"id_project",
 			"getValue" : function(f){
-				var field = this["contactIdFieldName"];
+				var field = this["projectIdField"];
 				return f(field);
 			},
 		},
 	"fmRecordId" : {
-			"fmRecordIdFieldName":"-recid",
+			"fmRecordIdField":"-recid",
 			"getValue" : function(f){
-				var field = this["fmRecordIdFieldName"];
+				var field = this["fmRecordIdField"];
 				return f(field);
 			},
 		},
 	"fmModId" : {
-			"fmModIdFieldName":"-modid",
+			"fmModIdField":"-modid",
 			"getValue" : function(f){
-				var field = this["fmModIdFieldName"];
+				var field = this["fmModIdField"];
 				return f(field);
 			},
 		},
@@ -375,6 +404,7 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 	<script src="../fmxjDemo.js" type="text/javascript"></script> 
 	
 <script>
+		
 	
 	//button for running query and converting xml results to javascript objects
 	var btn = document.getElementById("btn1");
@@ -402,6 +432,24 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 	//button to do looping calls
 	var btnLoop = document.getElementById("btn2");
 	btnLoop.addEventListener("click",function(){
+		var max = 375;
+		var start = new Date().getTime();
+		var startFixed = start;
+		var sourceLoop = [];
+		var message = "";
+		var writeResults = function ( js,utc ) {
+			message += createMessageShort(js, utc, start, max);
+			sourceLoop = sourceLoop.concat(js);
+			var displayLoop = sourceLoop.slice(0,max);
+			var num = js.length;
+			if(num !== max){
+				var end = new Date().getTime();
+				message += sourceLoop.length + " total records downloaded and converted in " + (end - startFixed) + " total milliseconds!"
+			};
+			var txt = message + "\n\n\n" + JSON.stringify(displayLoop , null , 4 );
+			document.getElementById("example2").innerHTML = txt;
+			start = new Date().getTime(); // reset clock
+		} ;
 				
 		var requests =	[
 							{ "DateStart" : "<=2/28/2014" , "DateEnd" : ">=2/1/2014" } ,
@@ -410,10 +458,12 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 		
 		var sortObject = 	{ 
 							  "field1" : "DateStart" ,
-							  "sort1" : "ascend" 
+							  "order1" : "ascend" 
 							} ;
+							
+		var q = fmxj.findRecordsURL("Events","Events",requests,sortObject);
 						
-		updateJSONLoop("example2", requests, 500 , sortObject ); //loads 500 records at a time.
+		fmxj.postQueryFMS(q,writeResults,null,relay,null,max);
 
 	});
 	
@@ -464,23 +514,23 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 		var start = new Date().getTime();
 		var fcObject = 	{
 		"id" : {
-			"idFieldName":"id",
+			"idField":"id",
 			"getValue" : function(f){
-				var field = this["idFieldName"];
+				var field = this["idField"];
 				return f(field);
 			},
 		},
 		"title" : {
-			"titleFieldName":"Summary",
+			"titleField":"Summary",
 			"getValue" : function(f){
-				var field = this["titleFieldName"];
+				var field = this["titleField"];
 				return f(field);
 			},
 		},
 		"allDay" : {
-			"timeStartFieldName" : "TimeStart",
+			"timeStartField" : "TimeStart",
 			"getValue" : function(f){
-				var field = this["timeStartFieldName"];
+				var field = this["timeStartField"];
 				if(f(field).length){//we have a start time so this is false
 					return false;
 				}
@@ -490,85 +540,101 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 			},
 		},
 		"start" : {
-			"timeStartFieldName" : "TimeStart",
-			"dateStartFieldName" : "DateStart",
+			"timeStartField" : "TimeStart",
+			"dateStartField" : "DateStart",
+			"yearFormat" : "MM-DD-YYYY",
+			"timeFormat" : "HH:mm",
+			"timezone" : "America/Los_Angeles",
 			"getValue" : function(f){
-				var time = this["timeStartFieldName"];
-				var date = this["dateStartFieldName"];
-				var d = new Date( f(date) + " " + f(time));
-				return d.toISOString()
+				var time = this["timeStartField"];
+				var date = this["dateStartField"];
+				var zone = this["timezone"];
+				var yearFormat = this["yearFormat"];
+				var timeFormat = this["timeFormat"];
+				var date = moment( f(date) + " " + f(time) , yearFormat + " " + timeFormat );
+				return date.tz(zone).format();
 			},
 		},
 		"end" : {
-			"timeEndFieldName" : "TimeEnd",
-			"dateEndFieldName" : "DateEnd",
+			//not uncommon for FM events to not have end times.
+			"timeEndField" : "TimeEnd",
+			"dateEndField" : "DateEnd",
+			"dateStartField" : "DateStart", //if no end date is specified we'll need to use the start date.
+			"yearFormat" : "MM-DD-YYYY",
+			"timeFormat" : "HH:mm",
+			"timezone" : "America/Los_Angeles",
 			"getValue" : function(f){
-				var time = this["timeEndFieldName"];
-				var date = this["dateEndFieldName"];
+				var time = this["timeEndField"];
+				var date = this["dateEndField"];
+				var sdate = this["dateStartField"];
+				var zone = this["timezone"];
+				var yearFormat = this["yearFormat"];
+				var timeFormat = this["timeFormat"];
+				//use start date if no end date
+				if(!f(date)){ var d = f(sdate) } else { var d = f(date)};
 				if(f(time).length){
-					var d = new Date(f(date) + " " + f(time));
+					d = moment( d + " " + f(time) , yearFormat + " " + timeFormat );
 				}
 				else
 				{
-					var d = new Date(f(date));
-					d.setDate(d.getDate()+1);
-				}
-				return d.toISOString();
+					d = moment( d , yearFormat + " " + timeFormat ).add( 1, "days");
+				};
+				return d.tz(zone).format();
 			},
 		},
 		"description" : {
-			"descriptionFieldName":"Description",
+			"descriptionField":"Description",
 			"getValue" : function(f){
-				var field = this["descriptionFieldName"];
+				var field = this["descriptionField"];
 				return f(field);
 			},
 		},
 		"resource" : {
-			"resourceFieldName":"Resource",
+			"resourceField":"Resource",
 			"getValue" : function(f){
-				var field = this["resourceFieldName"];
+				var field = this["resourceField"];
 				return f(field);
 			},
 		},
 		"status" : {
-			"statusFieldName":"Status",
+			"statusField":"Status",
 			"getValue" : function(f){
-				var field = this["statusFieldName"];
+				var field = this["statusField"];
 				return f(field);
 			},
 		},
 		"contactId" : {
-			"contactIdFieldName":"id_contact",
+			"contactIdField":"id_contact",
 			"getValue" : function(f){
-				var field = this["contactIdFieldName"];
+				var field = this["contactIdField"];
 				return f(field);
 			},
 		},
-		"contactId" : {
-			"contactIdFieldName":"id_contact",
+		"projectId" : {
+			"projectIdField":"id_Project",
 			"getValue" : function(f){
-				var field = this["contactIdFieldName"];
+				var field = this["projectIdField"];
 				return f(field);
 			},
 		},
 		"fmRecordId" : {
-			"fmRecordIdFieldName":"-recid",
+			"fmRecordIdField":"-recid",
 			"getValue" : function(f){
-				var field = this["fmRecordIdFieldName"];
+				var field = this["fmRecordIdField"];
 				return f(field);
 			},
 		},
 		"fmModId" : {
-			"fmModIdFieldName":"-modid",
+			"fmModIdField":"-modid",
 			"getValue" : function(f){
-				var field = this["fmModIdFieldName"];
+				var field = this["fmModIdField"];
 				return f(field);
 			},
 		},
 
 		
 		};
-		var query = fmxj.findRecordsURL("Events", "Events", requests);
+		var query = fmxj.findRecordsURL("Events", "Events" , requests);
 		updateElement("example5","<span class=\"resultHeader\">POST: " + query + "</span>\n\n");
 		fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);
 	});
