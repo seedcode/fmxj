@@ -10,7 +10,7 @@
 
 Working examples and basic function descriptions are available at the <a href="http://www.seedcode.com/fmxj/fmxj.html" target="_blank">fmxj example page</a>.
 
-fmxj.js does not have any dependencies, but does use <a href="https://github.com/LeaVerou/prism" target="_blank">prism.js</a> for the demo page code blocks.
+fmxj.js does not have any dependencies, but does use <a href="https://github.com/LeaVerou/prism" target="_blank">prism.js</a> for the demo page code blocks and <a href="http://momentjs.com/" target="_blank">moment.js</a> for the postQueryFMS() demo page resultClass example.
 
 fmxj.js is designed to do the data interchange work with FileMaker Server in JavaScript. Query strings are created from JavaScript Objects and then sent as a POST to FileMaker's XML Web Publishing Engine. An XML FMPXMLRESULT is returned and converted into JavaScript Objects/JSON by fmxj. The core idea is to do as little as possible on the FileMaker server and shift what we can to the client and JavaScript processes. Supporting FileMaker's Web Publishing can be challenging so removing as many variabes as possible is one of our goals with this project.
 
