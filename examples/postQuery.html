@@ -38,7 +38,7 @@
 		<p><div class="divSeparator"></div></p>
 		
 
-		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, resultClass, max])</h3>
+		<h3 class="functionTitle">postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, resultClass, max, nestPortals])</h3>
 		<div class="text">Performs an Ajax call to FileMaker Server. Results are converted to an Array of Objects(JSON) and passed to the callBackOnReady handler function. Query arguments can be created from JavaScript Objects using the Query Functions. All fields on the target layout will be returned as object properties (unless a resultClass argument is passed). Properties for -recid and -modid will be added automatically to each object in the array. Portals will be returned as a nested array of objects with the related table occuremce name as the property name, prefixed with a hyphen. You can also define your own object (class) and map the FileMaker fields to your object's properties. Then pass this object as the resultClass argument(see example 5).</div>
 	</br>
 		<div class="divSeparator"></div>
@@ -179,6 +179,20 @@ In addition to straight field mapping, you can also define the <span class="func
 		</span>	
 		<div class="desc">
 			(Optional) Passing a number to this argument will limut the number if results returned per "page." If not all query results are returned in a page then the function will POST for the next page recursively until all results are returned. 250 to 500 records seems to be ideal for FMS. See example 2.
+</div>
+
+		<div class="divSeparator"></div>
+		<div class="argument">
+			nestPortals
+		</div>
+		<span class="text">
+			Type:
+		</span>
+		<span class="type boolean">
+			Boolean
+		</span>	
+		<div class="desc">
+			(Optional) The default for this behavior is true, so related fields (in portals or not) will be nested arrays. If set to false, then fields will not be nested. If there is a portal on the target layout and the argument is set to false, then just the first portal row will be returned (not nested).
 </div>
 		
 		

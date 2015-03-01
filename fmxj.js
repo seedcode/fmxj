@@ -48,7 +48,7 @@ return {
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
 //resultClass is object for defining result objects, specify new properties and map the source values.
 //max will paginate results and recursively return pages to the callBack until all results have been returned.
-function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass , max ) {
+function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass , max , portal ) {
 	
 	//check what query type we are as we'll do custom results for some (delete findany)	
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
@@ -77,7 +77,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 	{
 		var utc = new Date().getTime();
-	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass);
+	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass,portal);
 		xmlhttp = null;
 		if ( js ) { internalCallBack ( js , utc ) } ;
 	}
@@ -173,7 +173,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 //parses a FMPXMLRESULT into JSON adding -recid and -modid properties.
 //FMPXMLRESULT is 50-60% the size of fmresultset, so that's what we're using.
 //function for converting xml onready in queryFMS but could have uses outside of there, so leaving Public
-function convertXml2Js( xml , requestType , resultClass ){
+function convertXml2Js( xml , requestType , resultClass , portal ){
 		
 		//rather than parsing errors.
 		if(!xml){return
@@ -214,7 +214,6 @@ function convertXml2Js( xml , requestType , resultClass ){
 			var typeTag = "TYPE";
 			var field = "";
 			var type = "";
-			
 			var fieldCount = FMXMLMetaData.childNodes.length ;
 			var i = 0;
 			
@@ -222,7 +221,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 				field = FMXMLMetaData.childNodes[i].getAttribute(nameTag);
 				type = FMXMLMetaData.childNodes[i].getAttribute(typeTag);
 				//related field
-				if(field.indexOf("::")>0){
+				if(field.indexOf("::")>0 && portal===true){
 					var pos = field.indexOf("::");
 					var t = field.substring(0,pos);
 					var f = field.substring(pos+2);
@@ -254,7 +253,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 			if(field==="-recid"){return id};
 			if(field==="-modid"){return mid};
 			var a = fieldObjects["model"][field];
-			if(a.length>1){ //fields in a portal
+			if(a.length>1||field.indexOf("-")===0){ //fields in a portal
 				var i = 0;
 				var result = [];
 				for (i in a){
@@ -274,6 +273,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 			if(field==="-recid"){return id};
 			if(field==="-modid"){return mid};
 			var a = fieldObjects["model"][field];
+			console.log(field.indexOf("-"));
 			if(a.length>1){ //fields in a portal
 				var i = 0;
 				var result = [];
@@ -349,8 +349,8 @@ function convertXml2Js( xml , requestType , resultClass ){
 				var props = Object.getOwnPropertyNames(fieldObjects["model"]);
 				for (c in props){
 					val = valueByField(props[c]);
-					if (val.length===1){
-					thisObject[props[c]] = val[0];
+					if (val.length===1&&props[c].indexOf("-")!==0){
+						thisObject[props[c]] = val[0];
 					}
 					else{
 						index = fieldObjects["model"][props[c]]; //index of fields from the model
@@ -358,7 +358,7 @@ function convertXml2Js( xml , requestType , resultClass ){
 							fields.push(fieldObjects["index"][index[i]]); //fieldnames
 							arrays.push(val[i]); //array of arrays
 						};
-					thisObject[props[c]] = arraysToObjects(fields, arrays);
+							thisObject[props[c]] = arraysToObjects(fields, arrays);
 					};
 				};
 			};
@@ -368,7 +368,6 @@ function convertXml2Js( xml , requestType , resultClass ){
 		//define layout model
 		var mData = xml.getElementsByTagName(metadataTag)[0];
 		var fieldObjects = layoutModel(mData);
-		//console.log(fieldObjects);
 		
 		//we handle the results format a little differently for these queries so flag them,
 		var isDeleteRequest = false;

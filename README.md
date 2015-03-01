@@ -20,7 +20,7 @@ POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP rel
 The **postQueryFMS()** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
-**postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, classResult, max])**
+**postQueryFMS(query, callBackOnReady[, callBackOnDownload, phpRelay, classResult, max, nestPortals])**
 
 * **query:** string: The query, built by one of the fmxj URL functions
 * **callBackOnReady:** function: The handler function for the returned array of objects.
@@ -28,6 +28,7 @@ The **postQueryFMS()** is the primary function used for POSTing queries to FileM
 * **phpRelay:** (optional) object: specifies the server address and name of the php relay file being used.
 * **classResult:** (optional) object: defines "classes" the result objects rather then letting the FileMaker layout do this.
 * **max:** (optional) number: limts the number of results returned per "page." If not all query results are returned in a page then the function will POST for the next page recursively until all results are returned. This argument will override any max argument specified in the query object, but not the skip.
+* **nestPortals:** (optional) boolean: Determines whether realted fields on the target layout will be treated as nested arrays. If set to *true*, field values will become nested arrays regardless of number of fields, number of portal rows or even if no portal is present on the layout. If set to *false* then the field values will be set to the top level of the object with their full related field name. If set to false and there is a portal on the layout then just the first portal row will be returned, not nested.
 
 An optional handler function can be passed as well to report the download progress from FileMaker Server.  Note that FileMaker server does not pass the *e.total* property in it's progres reporting, only the bytes downloded *e.loaded*.
 
@@ -97,7 +98,7 @@ An optional handler function can be passed as well to report the download progre
     }
 ]
 ```
-**Example of formatted results (stringified JSON) returned by the postQueryFMS function for a find query with a Portal on the target layout:** *(We recommend using this sparingly as it can put a significantly higher load on the server, and we'll be exploring some client side alternitives to this.)*
+**Example of formatted results (stringified JSON) returned by the postQueryFMS function for a find query with a Portal on the target layout.** **nestPortals** must be set to *true* for this nesting to take place, otherwise just the first portal row will be returned at the top level.  *(We recommend using this sparingly as it can put a significantly higher load on the server, and we'll be exploring some client side alternitives to this.)*
 
 ```json
 [
