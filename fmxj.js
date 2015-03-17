@@ -48,7 +48,12 @@ return {
 //var phpRelay = {"php":"fmxj.php","server":"192.168.1.123","protocol":"http","port":80,"user":"Admin","pass":"1234"};
 //resultClass is object for defining result objects, specify new properties and map the source values.
 //max will paginate results and recursively return pages to the callBack until all results have been returned.
-function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass , max , portal ) {
+function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay , resultClass , max , nestPortals ) {
+	
+	//if you want nesting related records on or off by default, on for this build
+	if(nestPortals==null){
+		nestPortals=false;
+	};
 	
 	//check what query type we are as we'll do custom results for some (delete findany)	
 	//check if we're a delete request as we handle error captryre differently, i.e. return ERRORCODE:0.
@@ -77,7 +82,7 @@ function postQueryFMS( query , callBackOnReady , callBackOnDownload , phpRelay ,
 	if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
 	{
 		var utc = new Date().getTime();
-	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass,portal);
+	    var js = convertXml2Js(xmlhttp.responseXML,parm,resultClass,nestPortals);
 		xmlhttp = null;
 		if ( js ) { internalCallBack ( js , utc ) } ;
 	}
@@ -188,6 +193,9 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 		var errorCodeTag = "ERRORCODE" ;
 		var description = "DESCRIPTION"
 		var metadataTag = "METADATA" ;
+		var dataBaseTag = "DATABASE" ;
+		var dateFormatTag = "DATEFORMAT" ;
+		var timeFormatTag = "TIMEFORMAT" ;
 		var recordTag = "ROW" ;
 		var foundTag = "FOUND";
 		var recid = "RECORDID";
@@ -253,7 +261,7 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 			if(field==="-recid"){return id};
 			if(field==="-modid"){return mid};
 			var a = fieldObjects["model"][field];
-			if(a.length>1||field.indexOf("-")===0){ //fields in a portal
+			if(a.length>1&&field.indexOf("-")===0){ //fields in a portal
 				var i = 0;
 				var result = [];
 				for (i in a){
@@ -273,7 +281,6 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 			if(field==="-recid"){return id};
 			if(field==="-modid"){return mid};
 			var a = fieldObjects["model"][field];
-			console.log(field.indexOf("-"));
 			if(a.length>1){ //fields in a portal
 				var i = 0;
 				var result = [];
@@ -293,6 +300,8 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 			//return as an array as we may have multiples.
 			var column = row.getElementsByTagName(colTag)[i];
 			var children = column.childNodes.length;
+			//override the count if portal is set to false so we just get the first value
+			if(!portal){children=1};
 			var c = 0;
 			var data = "";
 			var val = "";
@@ -395,7 +404,17 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 		
 		//altrnate formatting depending on request
 		if(isFindAnyRequest){// return as object with two contained objects {model,result}
-			result = [fieldObjects.fields];
+			var dateFormat = id = xml.getElementsByTagName(dataBaseTag)[0].getAttribute(dateFormatTag);
+			var timeFormat = id = xml.getElementsByTagName(dataBaseTag)[0].getAttribute(timeFormatTag);
+			
+			result = [
+				{
+					"DATEFORMAT":dateFormat,
+					"TIMEFORMAT":timeFormat,
+	
+					"FIELDS":fieldObjects.fields,
+				}
+			];
 			return result;
 		}
 		else{
@@ -531,7 +550,7 @@ function editRecordURL( fileName , layoutName , editObj ){
 		};
 	for ( f in fieldNames ){
 		thisField = fieldNames[f];
-		q += "&" + thisField + "=" + editObj[thisField];
+		q += "&" + thisField + "=" + encodeURIComponent(editObj[thisField]);
 	};
 	q = q + tag ;
 	return "-db=" + fileName + "&-lay=" + layoutName + q ;
@@ -1013,7 +1032,6 @@ function updateParam(query, param, value){
 
 
 }())
-
 
 
 
