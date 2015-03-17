@@ -178,7 +178,7 @@ In addition to straight field mapping, you can also define the <span class="func
 			Number
 		</span>	
 		<div class="desc">
-			(Optional) Passing a number to this argument will limut the number if results returned per "page." If not all query results are returned in a page then the function will POST for the next page recursively until all results are returned. 250 to 500 records seems to be ideal for FMS. See example 2.
+			(Optional) Passing a number to this argument will limit the number if results returned per "page." If not all query results are returned in a page then the function will POST for the next page recursively until all results are returned. 250 to 500 records seems to be ideal for FMS. See example 2.
 </div>
 
 		<div class="divSeparator"></div>
@@ -192,7 +192,7 @@ In addition to straight field mapping, you can also define the <span class="func
 			Boolean
 		</span>	
 		<div class="desc">
-			(Optional) The default for this behavior is true, so related fields (in portals or not) will be nested arrays. If set to false, then fields will not be nested. If there is a portal on the target layout and the argument is set to false, then just the first portal row will be returned (not nested).
+			(Optional) The default for this behavior is false. If set to false, then fields will not be nested. If there is a portal on the target layout and the argument is set to false, then just the first portal row will be returned (not nested). If set to true, the related fields  (in portals or not) will be returned nested arrays. See example 4 below.
 </div>
 		
 		
@@ -265,11 +265,11 @@ fmxj.postQueryFMS(query, onReadyFunction) ;</code></pre>
 <pre id="example3" class="result"></pre>
 <div class="divSeparator"></div>
 <div class="argument">example 4</div>
-<div class="text">Portals on the target layouts are converted to nested arrays. The TO name of the portal's source will be used as the property name, and will be prefixed by a hyphen to make sure it doesn't collide with a field name in the parent table. This puts a higher load on the server, so use sparingly or consider an alternitive structure using the <span class="func">nestObjects()</span> function.</div>
+<div class="text">Portals on the target layouts can be converted to nested arrays. By specifying the nestPortals argument as <span class="object">true</span>, the TO name of the portal's source will be used as the property name, and will be prefixed by a hyphen to make sure it doesn't collide with a field name in the parent table. This puts a higher load on the server, so use sparingly or consider an alternitive structure using the <span class="func">nestObjects()</span> function. The argument is <span class="object">false</span> by default, so you must pass <span class="object">true</span> for the nesting.</div> 
 <pre class="line-numbers pad shadow">
 <code class="language-javascript">
 var query = fmxj.findRecordsURL("Contacts", "Contacts");
-fmxj.postQueryFMS(query, onReadyFunction, onProgressFunction);</code></pre>
+fmxj.postQueryFMS(q, writeResults, writeDownload, relay, null, 1000, true);</code></pre>
 <button id="btn4">try example 4</button>
 <pre id="example4" class="result tall"></pre>
 
@@ -510,7 +510,7 @@ fmxj.postQueryFMS(query, writeResults, writeDownload, relay, fcObject);</code></
 		//var contactRequests = [{"Status":"Customer"}];
 		var q = fmxj.findRecordsURL("Contacts" , "Contacts") ;
 		updateElement("example4","<span class=\"resultHeader\">POST: " + q + "</span>\n\n");
-		fmxj.postQueryFMS(q, writeResults, writeDownload, relay);
+		fmxj.postQueryFMS(q, writeResults, writeDownload, relay, null, 1000, true);
 	});
 	
 	//button for running query and converting xml results to javascript objects
