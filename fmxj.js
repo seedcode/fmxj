@@ -299,6 +299,9 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 			//Just get the values by index
 			//return as an array as we may have multiples.
 			var column = row.getElementsByTagName(colTag)[i];
+			if(!column){
+				return ""
+			}
 			var children = column.childNodes.length;
 			//override the count if portal is set to false so we just get the first value
 			if(!portal){children=1};
@@ -321,6 +324,9 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 		function arraysToObjects(index, arrays){
 			var result = [];
 			var aLgth = arrays[0].length;
+			if(aLgth===0){
+				return "";
+			}
 			var iLgth = index.length;
 			var i = 0;
 			var a = 0;
