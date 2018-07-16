@@ -1,7 +1,7 @@
-#fmxj.js
-###A Javascript based approach to FileMaker Custom Web Publishing
+# fmxj.js
+## A Javascript based approach to FileMaker Custom Web Publishing
 
-###With fmxj.js and simple JavaScript Objects you can
+### With fmxj.js and simple JavaScript Objects you can
 
 * Build complex queries and POST them to FileMaker Server
 * Return FileMaker parent and child records as JavaScript Objects/JSON
@@ -16,7 +16,7 @@ fmxj.js is designed to do the data interchange work with FileMaker Server in Jav
 
 POSTS can be done directly to the FileMaker Server's XML WPE or a simple PHP relay can be used to get around cross-domain issues and provide more secure authentication options.  With the goal of doing as little as possible on the Server, we were a little disappointed to need to rely on PHP at all, but there are some limitations to interacting with the FMS XML API directly, and a PHP relay is the simplest way to get around them.  Specifically it's much easier to add access headers to a PHP page than it is to Apache! See more on the PHP relay below in the **postQueryFMS()** function.
 
-##Functions for working with FileMaker Server
+## Functions for working with FileMaker Server
 The **postQueryFMS()** is the primary function used for POSTing queries to FileMaker Server via httpXMLRequest and then converting the FMPXMLRESULT xml results into JavaScript objects for callback.  Queries can be created easily from JavaScript objects using the  fmxj URL functions below.
 
 ***
@@ -369,7 +369,7 @@ results in objects like this:
 ```
 
 ***
-##Data Functions
+## Data Functions
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  The idea being that you can use existing objects or simple JSON to create complex query strings.
 
@@ -480,7 +480,7 @@ var query = fmxj.deleteRecordURL("Events" , "Events" , 6198);
 ...which can now be passed to *postQueryFMS()*.
 
 ***
-##Design Functions
+## Design Functions
 
 These three functions are used to build the specific query type strings for the **postQueryFMS** function to POST.  These three are for getting facts about the files on the server. The layouts in a file, and the fields on a layout.
 
@@ -550,7 +550,7 @@ var query = fmxj.LayoutFieldsURL("Events" , "Events");
 
 
 ***
-##Functions for working with JavaScript Objects
+## Functions for working with JavaScript Objects
 Functions for handling your objects in JavaScript. One of the ideas of fmxj is to have the FileMaker server do as little work as possible. We want to get our data with small Ajax calls and any kind of necessary scripting in JavaScript. 
 
 *We do have a php deployment option, but the php page is set up to do as little as possible.  It takes our POST then relays it via cURL to the FileMaker Server. It then returns the raw FMPXMLRESULT for fmxj to convert to objects.  We don't anticipate needing to (or wanting to) enhance this server side processing.  Script running arguments were intentionally left off the findRecordsURL() function for the same reason. We weren't even sure about including the sort argument and supporting Portals as nested arrays, but they are in there now.*
