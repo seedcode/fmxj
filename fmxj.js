@@ -358,22 +358,22 @@ function convertXml2Js( xml , requestType , resultClass , portal ){
 			else {
 				thisObject["-recid"]=id;
 				thisObject["-modid"]=mid;
-				var arrays = [];
-				var index = [];
-				var fields = [];
 				var props = Object.getOwnPropertyNames(fieldObjects["model"]);
 				for (c in props){
+					var arrays = [];
+					var index = [];
+					var fields = [];
 					val = valueByField(props[c]);
-					if (val.length===1&&props[c].indexOf("-")!==0){
+					if (val.length===1&&props[c].indexOf("-")!==0){;
 						thisObject[props[c]] = val[0];
 					}
 					else{
 						index = fieldObjects["model"][props[c]]; //index of fields from the model
-						for (i in index){  //get the field name from the index array
+						for (var i = 0 ; i < index.length ; i++ ){  //get the field name from the index array
 							fields.push(fieldObjects["index"][index[i]]); //fieldnames
 							arrays.push(val[i]); //array of arrays
 						};
-							thisObject[props[c]] = arraysToObjects(fields, arrays);
+						thisObject[props[c]] = arraysToObjects(fields, arrays);
 					};
 				};
 			};
@@ -1003,8 +1003,6 @@ function nestObjects( parentArray, childArray, childName, predicates) {
 			return true;
 		}
 	};
-	
-	console.log(childArray.slice(0,10));
 	
 	for (var pa in parentArray){
 		var cc = [];
